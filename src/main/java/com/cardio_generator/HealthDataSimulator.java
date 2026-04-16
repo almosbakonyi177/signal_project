@@ -23,6 +23,13 @@ import com.cardio_generator.outputs.OutputStrategy;
 import com.cardio_generator.outputs.TcpOutputStrategy;
 import com.cardio_generator.outputs.WebSocketOutputStrategy;
 
+/**
+ * Represents a cardiology simulator for health simulation.
+ * This class is responsible for construction of a whole cardiology simulation,
+ * it handles the patient count, a scheduler and output strategy.
+ *
+ * @author Almos Bakonyi
+ */
 public class HealthDataSimulator {
 
     private static int patientCount = 50; // Default number of patients
@@ -42,6 +49,15 @@ public class HealthDataSimulator {
         scheduleTasksForPatients(patientIds);
     }
 
+    /**
+     * This is a parser, it gets an input array of strings, and handles different cases.
+     * It handles if the user requests help, sets the patient count in the simulation, sets up
+     * the output strategy based on the request in the given array. If the user do not request one
+     * of these options, it prints an error message of unknown option.
+     * @param args String array, which contains the requests to set up
+     *             the simulation.
+     * @throws IOException Input error of unknown option request from the user.
+     */
     private static void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -103,6 +119,10 @@ public class HealthDataSimulator {
         }
     }
 
+    /**
+     * It shows the options of what the user is able to do/
+     * shows usage instructions for the user.
+     */
     private static void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");
         System.out.println("Options:");
@@ -120,6 +140,15 @@ public class HealthDataSimulator {
                 "  This command simulates data for 100 patients and sends the output to WebSocket clients connected to port 8080.");
     }
 
+    /**
+     * This function takes an integer patientCount as input, and set up a list
+     * of patient IDs, in ascending order starting from 1, always accumulate the next ID by 1
+     * until it reaches the patientCount.
+     * For example: we call the function with a patientCount=3, the returned list
+     * will be: {1,2,3}
+     * @param patientCount An integer of the number of patients.
+     * @return List of newly generated patient IDs.
+     */
     private static List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
@@ -128,6 +157,10 @@ public class HealthDataSimulator {
         return patientIds;
     }
 
+    /**
+     * This function schedule tasks/different generators for every patient in a given patient list.
+     * @param patientIds A list of patient IDs that we want to schedule the tasks for.
+     */
     private static void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);

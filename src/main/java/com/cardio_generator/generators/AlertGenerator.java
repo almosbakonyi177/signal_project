@@ -4,6 +4,12 @@ import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
 
+/**
+ * Represents an alert generator based on acceptable randomness.
+ * This class is responsible to generate random alert data for a given patient
+ * using randomness based on given parameters to keep the representativeness.
+ *
+ */
 public class AlertGenerator implements PatientDataGenerator {
 
     public static final Random randomGenerator = new Random();
@@ -13,6 +19,18 @@ public class AlertGenerator implements PatientDataGenerator {
         AlertStates = new boolean[patientCount + 1];
     }
 
+    /**
+     * This function simulates an alert generator,
+     * where if a patient has a pressed alert state,
+     * it will generate a resolved alert output
+     * with 90% chance.
+     * If the patient is not in alert state, it will generate a
+     * triggered alert with the probability of at least one alert
+     * in the period.
+     * @param patientId Integer of the ID of patient we want to simulate the alert output for.
+     * @param outputStrategy The chosen output strategy,
+     *                       based on where we would like to save the alert data.
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {

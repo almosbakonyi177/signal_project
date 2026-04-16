@@ -8,6 +8,13 @@ import java.nio.file.Paths;
 import java.io.PrintWriter;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Represents a file writer that writes out different parameters,
+ * such as patient id, timestamp and mostly alert type and status,
+ * to a text file in a chosen base directory.x
+ *
+ * @author Almos Bakonyi
+ */
 public class FileOutputStrategy implements OutputStrategy {
 
     // I corrected the name of the non-constant baseDirectory variable
@@ -21,6 +28,14 @@ public class FileOutputStrategy implements OutputStrategy {
         this.baseDirectory = baseDirectory;
     }
 
+    /**
+     * It creates a base directory first, then a txt file in that directory,
+     * and writes the given parameters to the txt file divided by a comma.
+     * @param patientId Integer of the ID of the patient, who is linked to the information.
+     * @param timestamp Long of the timestamp of the given process.
+     * @param label The variable name in the process/a status name.
+     * @param data The value of the variable or status.
+     */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
         try {
