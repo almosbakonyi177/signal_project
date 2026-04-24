@@ -2,6 +2,9 @@ package com.alerts;
 
 import com.data_management.DataStorage;
 import com.data_management.Patient;
+import com.data_management.PatientRecord;
+
+import java.util.HashMap;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -11,6 +14,8 @@ import com.data_management.Patient;
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
+    private AlertManager alertManager = new AlertManager();
+
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -21,8 +26,7 @@ public class AlertGenerator {
      *                    data
      */
     public AlertGenerator(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;
-    }
+        this.dataStorage = dataStorage;}
 
     /**
      * Evaluates the specified patient's data to determine if any alert conditions
@@ -35,7 +39,18 @@ public class AlertGenerator {
      * @param patient the patient data to evaluate for alert conditions
      */
     public void evaluateData(Patient patient) {
-        // Implementation goes here
+        HashMap<String, Double> patientMap = patient.getAlertThresholds();
+        for (PatientRecord patientRecord : patient.getAllRecords()) {
+            if (patientMap.get(patientRecord.getRecordType())!=null){
+                // If the measurement data is bigger than threshold we trigger alert
+                if (patientMap.get(patientRecord.getRecordType())<patientRecord.getMeasurementValue()){
+                    Alert alert=new Alert(patientRecord.getPatientId(),
+                            patientRecord.getRecordType(),
+                            patientRecord.getTimestamp());
+                    triggerAlert(alert);
+                }
+            }
+        }
     }
 
     /**
@@ -47,6 +62,15 @@ public class AlertGenerator {
      * @param alert the alert object containing details about the alert condition
      */
     private void triggerAlert(Alert alert) {
-        // Implementation might involve logging the alert or notifying staff
+        alertManager.notifyStaff(alert);
+        alertManager.uploadAlert(alert);
+    }
+
+    /**
+     * Returns the alert manager that this class uses.
+     * @return the alert manager that this class uses.
+     */
+    public AlertManager getAlertManager() {
+        return alertManager;
     }
 }

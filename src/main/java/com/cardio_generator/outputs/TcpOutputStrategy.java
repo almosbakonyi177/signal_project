@@ -51,8 +51,8 @@ public class TcpOutputStrategy implements OutputStrategy {
      * the function will upload "3,0.1,Message,done" to the server.
      * @param patientId Integer of the patient ID.
      * @param timestamp long value of the timestamp.
-     * @param label String of alert type.
-     * @param data String of status.
+     * @param label String of alert/variable type.
+     * @param data String of status/value.
      */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {

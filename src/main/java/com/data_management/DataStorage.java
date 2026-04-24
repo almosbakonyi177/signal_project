@@ -14,13 +14,14 @@ import com.alerts.AlertGenerator;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
-
+    private Map<Integer, StaffMember>  staffMemberMap;
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
      */
     public DataStorage() {
         this.patientMap = new HashMap<>();
+        this.staffMemberMap = new HashMap<>();
     }
 
     /**
@@ -66,6 +67,15 @@ public class DataStorage {
         return new ArrayList<>(); // return an empty list if no patient is found
     }
 
+
+    public List<PatientRecord> getPatientRecords(int patientId) {
+        Patient patient = patientMap.get(patientId);
+        if(patient != null) {
+            patient.getAllRecords();
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * Retrieves a collection of all patients stored in the data storage.
      *
@@ -74,6 +84,39 @@ public class DataStorage {
     public List<Patient> getAllPatients() {
         return new ArrayList<>(patientMap.values());
     }
+
+
+    /**
+     * Retrieves a collection of all staff members stored in the data storage.
+     * @return list of all stuff members.
+     */
+    public Map<Integer, StaffMember> getStaffMembers() {
+        return staffMemberMap;
+    }
+
+    /**
+     * Adds a staff member to the list.
+     * It can happen if someone resigns or gets fired.
+     * @param staffMemberId
+     */
+    public void addStaffMemberData(int staffMemberId, String firstname,
+                                   String lastname, int roleLevel) {
+
+        StaffMember staffMember = new StaffMember(staffMemberId, firstname, lastname, roleLevel);
+        staffMemberMap.put(staffMemberId, staffMember);
+    }
+
+    /**
+     * Removes the chosen staff member from the staff member Map.
+     * It can happen if someone resigns or gets fired.
+     * @param staffMemberId The Id of staff member that will be deleted from the staff member Map.
+     */
+    public void deleteStaffMember(int staffMemberId) {
+        if (staffMemberMap.containsKey(staffMemberId)) {
+            staffMemberMap.remove(staffMemberId);
+        }
+    }
+
 
     /**
      * The main method for the DataStorage class.
