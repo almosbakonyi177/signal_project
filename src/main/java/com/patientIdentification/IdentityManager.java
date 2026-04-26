@@ -2,6 +2,7 @@ package com.patientIdentification;
 
 import com.data_management.DataStorage;
 import com.data_management.Patient;
+import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,6 +78,24 @@ public class IdentityManager {
     public void handleMismatch(int simulatorPatientId) {
         mismatchLog.add(Integer.toString(simulatorPatientId)+
                 ","+Integer.toString(year)+","+Integer.toString(month)+","+Integer.toString(day));
+    }
+
+    /**
+     *
+     * @param patientId
+     * @param patientRecord
+     */
+    public void addRecord(int patientId, PatientRecord patientRecord) {
+        if (!validateMatch(patientId)) {
+            // If there was no patient with this id, we document it
+            handleMismatch(patientId);
+            return;
+        }
+
+        // We add the incoming record to the original patient records.
+        if (!(dataStorage.getPatientRecords(patientId).contains(patientRecord))) {
+            dataStorage.getPatientRecords(patientId).add(patientRecord);
+        }
     }
 
     /**

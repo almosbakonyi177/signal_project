@@ -1,8 +1,6 @@
 package com.patientIdentification;
 
 import com.data_management.PatientRecord;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,5 +16,13 @@ public class HospitalPatient {
         this.patientId = patientId;
         this.patientRecords = patientRecords;
         this.alertThresholds = alertThresholds;
+    }
+
+    /**
+     * Retrieves this hospital patient's records.
+     * @return This hospital patient's records.
+     */
+    public List<PatientRecord> getPatientRecords() {
+        return this.patientRecords;
     }
 }
