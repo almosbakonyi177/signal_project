@@ -4,9 +4,14 @@ import com.patientIdentification.IncomingDataPoint;
 
 import java.util.List;
 
+/**
+ * Responsible for looking for data from the web socket, while
+ * the listening is active.
+ */
 public class WebSocketDataListener implements DataListener {
     private JSONDataParser jsonDataParser;
     private DataSourceAdapter  dataSourceAdapter;
+
 
     public WebSocketDataListener (JSONDataParser jsonDataParser,
                                   DataSourceAdapter  dataSourceAdapter) {
@@ -31,7 +36,7 @@ public class WebSocketDataListener implements DataListener {
 
     /**
      * Sends the raw message to the JSON parser.
-     * @param message The message that it sends to the parser.
+     * @param message The message that will be sent to the parser.
      */
     public void onMessage (String message) {
         List<IncomingDataPoint> incomingDataPoints = jsonDataParser.parse(message);

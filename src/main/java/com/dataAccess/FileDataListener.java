@@ -3,13 +3,18 @@ package com.dataAccess;
 import com.patientIdentification.IncomingDataPoint;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class FileDataListener implements  DataListener {
+
+/**
+ * Responsible for listening for CSV file data, and ,while
+ * the listening is active, looking for updates in the given file.
+ */
+public class    FileDataListener implements  DataListener {
     private String filePath;
     private boolean activeListening = false;
     private ExcelDataParser excelDataParser = new ExcelDataParser();
@@ -79,13 +84,16 @@ public class FileDataListener implements  DataListener {
                     continue; // We do not need the header
                 }
                 processedLinesNow++;
-                stringBuilder.append(line).append("\n");
+                if (processedLinesNow > processedLines){
+                    stringBuilder.append(line).append("\n");
+                }
             }
             br.close();
 
 
             if (processedLinesNow > processedLines) {
                 lastData = lastData + stringBuilder;
+                processedLines = processedLinesNow;
                 // We only send it to the parser then if there is something new
                 List<IncomingDataPoint> incomingDataPoints =
                         excelDataParser.parse(stringBuilder.toString());

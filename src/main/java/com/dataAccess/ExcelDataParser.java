@@ -1,18 +1,19 @@
 package com.dataAccess;
 
-import com.patientIdentification.IncomingDataPoint;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import com.patientIdentification.IncomingDataPoint;
 import java.util.List;
 
+/**
+ * Responsible only for parsing raw CSV data.
+ */
 public class ExcelDataParser implements DataParser {
 
     /**
      * Parses the raw text from a CSV file.
      * @param rawData Raw text from a CSV file.
      * @return A list of IncomingDataPoint objects, in which the
-     * data are standardized.
+     * raw data are standardized.
      */
     @Override
     public List<IncomingDataPoint> parse(String rawData) {

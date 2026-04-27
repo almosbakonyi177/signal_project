@@ -5,6 +5,9 @@ import com.patientIdentification.IncomingDataPoint;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for parsing raw String data from JSON file.
+ */
 public class JSONDataParser implements DataParser {
 
     /**
@@ -57,7 +60,9 @@ public class JSONDataParser implements DataParser {
                     }
                     i = i + 4;
                     IncomingDataPoint incomingDataPoint =
-                            new IncomingDataPoint(patientId, MeasurementValue, recordType, timestamp);
+                            new IncomingDataPoint(
+                                    patientId, MeasurementValue, recordType, timestamp);
+
                     incomingDataPoints.add(incomingDataPoint);
                 }
                 catch (Exception e) {
