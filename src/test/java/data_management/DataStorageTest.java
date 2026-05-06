@@ -8,6 +8,9 @@ import com.data_management.PatientRecord;
 
 import java.util.List;
 
+/**
+ * Responsible for testing the Data storing and retrieval module.
+ */
 class DataStorageTest {
 
     @Test

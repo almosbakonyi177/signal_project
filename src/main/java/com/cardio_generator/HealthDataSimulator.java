@@ -28,7 +28,6 @@ import com.cardio_generator.outputs.WebSocketOutputStrategy;
  * This class is responsible for construction of a whole cardiology simulation,
  * it handles the patient count, a scheduler and output strategy.
  *
- * @author Almos Bakonyi
  */
 public class HealthDataSimulator {
 

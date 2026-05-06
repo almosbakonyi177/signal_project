@@ -4,7 +4,10 @@ import com.data_management.PatientRecord;
 import java.util.HashMap;
 import java.util.List;
 
-// Represents the hospital patient, to who the measurements will be linked.
+/**
+ * Represents the copy of a hospital patient, whose data can be retrieved and
+ * to who the measurements will be linked.
+ */
 public class HospitalPatient {
     private int patientId;
     private List<PatientRecord> patientRecords;

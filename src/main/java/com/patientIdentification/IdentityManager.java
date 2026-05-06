@@ -9,36 +9,56 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Oversees the integrity, validates matches and handles mismatches between the incoming patient data
-// and hospital patient data. The coordinator of patient identification process.
+/**
+ * Oversees the integrity, validates matches and handles mismatches between the incoming patient data
+ * and hospital patient data. The coordinator of patient identification process.
+ */
 public class IdentityManager {
     private PatientIdentifier patientIdentifier;
-    private List<String> mismatchLog;
     private Map<Integer, HospitalPatient> hospitalPatientMap;
-    private int year;
-    private int month;
-    private int day;
     private DataStorage dataStorage;
+    private MismatchHandler mismatchHandler;
 
-    public IdentityManager(PatientIdentifier patientIdentifier,
-                           int year, int month, int day, DataStorage dataStorage) {
-        this.patientIdentifier = patientIdentifier;
-        hospitalPatientMap = new HashMap<>();
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public IdentityManager(Map<Integer, HospitalPatient> hospitalPatientMap,
+                           DataStorage dataStorage,
+                           MismatchHandler mismatchHandler) {
+
+        this.hospitalPatientMap = hospitalPatientMap;
+        this.patientIdentifier = new PatientIdentifier(hospitalPatientMap);
+
         this.dataStorage = dataStorage;
-        this.mismatchLog = new ArrayList<>();
+        this.mismatchHandler = mismatchHandler;
     }
 
 
+    /**
+     * Makes hard copy of all the patients data to a hospital patient,
+     * this helps to provide protection at data retrieval.
+     */
     public void copyHospitalPatients() {
         for (Patient patient : dataStorage.getAllPatients()) {
             HospitalPatient hospitalPatient = new HospitalPatient(patient.getPatientId(),
-                    patient.getAllRecords(), patient.getAlertThresholds());
+                    copyPatientRecords(patient.getPatientId()),
+                    new HashMap<>(patient.getAlertThresholds()));
 
             this.hospitalPatientMap.put(patient.getPatientId(), hospitalPatient);
         }
+    }
+
+    /**
+     * Makes a hard copy of all records of the given patient.
+     * @param patientId The patient of whose records we want to copy.
+     * @return A list of hard copy patient records.
+     */
+    public List<PatientRecord> copyPatientRecords(int patientId) {
+        List<PatientRecord> records = dataStorage.getPatientById(patientId).getAllRecords();
+        List<PatientRecord> returner = new ArrayList<>();
+        for (PatientRecord record : records) {
+            PatientRecord record1=new PatientRecord(patientId, record.getMeasurementValue(),
+                    record.getRecordType(),record.getTimestamp());
+            returner.add(record1);
+        }
+        return returner;
     }
 
 
@@ -53,6 +73,7 @@ public class IdentityManager {
         if (patientIdentifier.findHospitalPatient(simulatorPatientId) != null) {
             return true;
         }
+        mismatchHandler.handleMismatch(simulatorPatientId);
         return false;
     }
 
@@ -64,61 +85,26 @@ public class IdentityManager {
      */
     public HospitalPatient retrieveHospitalPatient(int simulatorPatientId) {
         if (validateMatch(simulatorPatientId)) {
-            if (patientIdentifier.findHospitalPatient(simulatorPatientId) != null) {
-                return hospitalPatientMap.get(simulatorPatientId);
-            }
+            return hospitalPatientMap.get(simulatorPatientId);
         }
         return null;
     }
 
     /**
-     * Reports on the log if there was no match between hospital patients and simulation patient id.
-     * @param simulatorPatientId Integer of patient Id that came from the simulation.
-     */
-    public void handleMismatch(int simulatorPatientId) {
-        mismatchLog.add(Integer.toString(simulatorPatientId)+
-                ","+Integer.toString(year)+","+Integer.toString(month)+","+Integer.toString(day));
-    }
-
-    /**
-     *
+     * Adds the incoming data point to the hospital patient.
      * @param patientId
      * @param patientRecord
      */
     public void addRecord(int patientId, PatientRecord patientRecord) {
         if (!validateMatch(patientId)) {
             // If there was no patient with this id, we document it
-            handleMismatch(patientId);
             return;
         }
 
         // We add the incoming record to the original patient records.
         if (!(dataStorage.getPatientRecords(patientId).contains(patientRecord))) {
-            dataStorage.getPatientRecords(patientId).add(patientRecord);
+            dataStorage.addPatientData(patientId, patientRecord.getMeasurementValue(),
+                    patientRecord.getRecordType(), patientRecord.getTimestamp());
         }
-    }
-
-    /**
-     * Setter for the year.
-     * @param year The current year.
-     */
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    /**
-     * Setter for the month.
-     * @param month The current month.
-     */
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    /**
-     * Setter for the day.
-     * @param day The current day.
-     */
-    public void setDay(int day) {
-        this.day = day;
     }
 }

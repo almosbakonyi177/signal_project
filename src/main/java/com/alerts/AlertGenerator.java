@@ -2,9 +2,9 @@ package com.alerts;
 
 import com.data_management.DataStorage;
 import com.data_management.Patient;
-import com.data_management.PatientRecord;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -15,6 +15,9 @@ import java.util.HashMap;
 public class AlertGenerator {
     private DataStorage dataStorage;
     private AlertManager alertManager = new AlertManager();
+    // Store checking methods in a list, therefore we can add a new checking method anytime
+    // without a lot of work on the existing code
+    private List<AlertCondition> alertConditions = new ArrayList<AlertCondition>();
 
 
     /**
@@ -26,7 +29,13 @@ public class AlertGenerator {
      *                    data
      */
     public AlertGenerator(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;}
+        this.dataStorage = dataStorage;
+
+        alertConditions.add(new BloodPressureChecker());
+        alertConditions.add(new BloodSaturationChecker());
+        alertConditions.add(new HypotensiveHypoxemiaChecker());
+        alertConditions.add(new ECGPeakChecker());
+    }
 
     /**
      * Evaluates the specified patient's data to determine if any alert conditions
@@ -39,18 +48,18 @@ public class AlertGenerator {
      * @param patient the patient data to evaluate for alert conditions
      */
     public void evaluateData(Patient patient) {
-        HashMap<String, Double> patientMap = patient.getAlertThresholds();
-        for (PatientRecord patientRecord : patient.getAllRecords()) {
-            if (patientMap.get(patientRecord.getRecordType())!=null){
-                // If the measurement data is bigger than threshold we trigger alert
-                if (patientMap.get(patientRecord.getRecordType())<patientRecord.getMeasurementValue()){
-                    Alert alert=new Alert(patientRecord.getPatientId(),
-                            patientRecord.getRecordType(),
-                            patientRecord.getTimestamp());
+
+        // We go through on all checking methods
+        for (AlertCondition alertCondition : alertConditions) {
+            ArrayList<Alert> alerts = alertCondition.check(patient);
+            // If there were alerts we go through on them and trigger the alerts
+            if (!alerts.isEmpty()) {
+                for (Alert alert : alerts) {
                     triggerAlert(alert);
                 }
             }
         }
+
     }
 
     /**

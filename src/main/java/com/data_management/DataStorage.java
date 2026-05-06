@@ -117,6 +117,21 @@ public class DataStorage {
         }
     }
 
+    /**
+     * Retrieves the patient by given patient Id, if exists.
+     * @param patientId The Id of patient, who we search for.
+     * @return The patient with the searched Id if the patient exists in the data storage,
+     * otherwise null.
+     */
+    public Patient getPatientById(int patientId) {
+        for (Integer patient : patientMap.keySet()) {
+            if(patient==patientId){
+                return patientMap.get(patient);
+            }
+        }
+        return null;
+    }
+
 
     /**
      * The main method for the DataStorage class.

@@ -15,7 +15,7 @@ public class AlertManager {
      */
     public void notifyStaff(Alert alert) {
         console.output(alert.getPatientId(),alert.getTimestamp(),
-                "threshold_exceed", alert.getCondition());
+                alert.getType(), alert.getCondition());
     }
 
     /**
@@ -24,6 +24,6 @@ public class AlertManager {
      */
     public void uploadAlert(Alert alert) {
         server.output(alert.getPatientId(),alert.getTimestamp(),
-                "threshold_exceed", alert.getCondition());
+                alert.getType(), alert.getCondition());
     }
 }

@@ -43,4 +43,22 @@ public class BloodPressureDataGenerator implements PatientDataGenerator {
             e.printStackTrace(); // This will print the stack trace to help identify where the error occurred.
         }
     }
+
+    public double generateBloodPressureSystolic(int patientId) {
+        int systolicVariation = random.nextInt(5) - 2; // -2, -1, 0, 1, or 2
+        int newSystolicValue = lastSystolicValues[patientId] + systolicVariation;
+        // Ensure the blood pressure stays within a realistic and safe range
+        newSystolicValue = Math.min(Math.max(newSystolicValue, 90), 180);
+        lastSystolicValues[patientId] = newSystolicValue;
+        return newSystolicValue;
+    }
+
+    public double generateBloodPressureDiastolic(int patientId) {
+        int diastolicVariation = random.nextInt(5) - 2;
+        int newDiastolicValue = lastDiastolicValues[patientId] + diastolicVariation;
+        // Ensure the blood pressure stays within a realistic and safe range
+        newDiastolicValue = Math.min(Math.max(newDiastolicValue, 60), 120);
+        lastDiastolicValues[patientId] = newDiastolicValue;
+        return newDiastolicValue;
+    }
 }

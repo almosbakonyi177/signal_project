@@ -1,6 +1,8 @@
 package com.patientIdentification;
 
-// Represents every incoming data from simulation.
+/**
+ * Represents every incoming data from simulation.
+ */
 public class IncomingDataPoint {
     private int simulatorPatientId;
     private double measurementValue;
