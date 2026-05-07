@@ -22,12 +22,15 @@ public class DataRetriever {
      * @param staffMember The staff member object, who requested data.
      * @param patientId The id of the patient whose records are requested.
      * @return The hard copy of the requested patient's records,
-     * only if the staff member has the correct role level to access.
+     * only if the staff member has the correct role level to access, otherwise null.
      */
     public List<PatientRecord> makeQuery(StaffMember staffMember, int patientId) {
+        if (staffMember == null || patientId <= 0 || dataStorage.getPatientById(patientId) == null) {
+            return null;
+        }
 
         // We check if the staff member is in the active member list
-        if (!dataStorage.getStaffMembers().containsKey(staffMember)) {
+        if (!dataStorage.getStaffMembers().containsKey(staffMember.getId())) {
             return null;
         }
 
@@ -58,5 +61,9 @@ public class DataRetriever {
             return false;
         }
         return true;
+    }
+
+    public AuditLogger getAuditLogger() {
+        return auditLogger;
     }
 }

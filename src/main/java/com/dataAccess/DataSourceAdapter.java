@@ -19,6 +19,10 @@ public class DataSourceAdapter {
      * @param incomingDataPoint One incoming record data.
      */
     public void integrateData(IncomingDataPoint incomingDataPoint) {
+        if (incomingDataPoint==null) {
+            return;
+        }
+
         PatientRecord record = new PatientRecord(incomingDataPoint.getPatientId(),
                 incomingDataPoint.getMeasurementValue(), incomingDataPoint.getRecordType(),
                 incomingDataPoint.getTimestamp());

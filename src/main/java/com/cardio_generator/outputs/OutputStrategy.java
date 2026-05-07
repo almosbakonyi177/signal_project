@@ -4,7 +4,6 @@ package com.cardio_generator.outputs;
  * This interface represents the basis of outputs.
  * The implementations must define an output void function.
  *
- * @author Almos Bakonyi
  */
 public interface OutputStrategy {
     /**

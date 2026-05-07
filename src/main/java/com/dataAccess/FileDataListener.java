@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * Responsible for listening for CSV file data, and ,while
  * the listening is active, looking for updates in the given file.
  */
-public class    FileDataListener implements  DataListener {
+public class FileDataListener implements  DataListener {
     private String filePath;
     private boolean activeListening = false;
     private ExcelDataParser excelDataParser = new ExcelDataParser();

@@ -35,6 +35,25 @@ public class PatientIdentificationTest {
         assertTrue(identityManager.validateMatch(1));
     }
 
+
+    /**
+     * Edge case: Test what happens, if we want to validate the match with a non existing
+     * hospital patient.
+     */
+    @Test
+    void testValidateMatchNonExistent()
+    {
+        DataStorage dataStorage = new DataStorage();
+        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
+
+        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
+                new MismatchHandler(null, 0,0,0));
+
+
+        assertFalse(identityManager.validateMatch(1));
+    }
+
+
     @Test
     void testHandleMismatch()
     {
@@ -51,6 +70,7 @@ public class PatientIdentificationTest {
         assertFalse(identityManager.validateMatch(3));
     }
 
+
     @Test
     public void testFindHospitalPatient()
     {
@@ -66,6 +86,7 @@ public class PatientIdentificationTest {
         assertTrue(patient!=null);
     }
 
+
     @Test
     public void testMismatchLog()
     {
@@ -80,11 +101,34 @@ public class PatientIdentificationTest {
         identityManager.validateMatch(2);
 
         //There should be one documented mismatch on the mismatch log
-        assertEquals(mismatchHandler.getMismatchLog().size(), 1);
+        assertEquals(1, mismatchHandler.getMismatchLog().size());
     }
 
     @Test
-    public void testAddRecordToExistingHospitalPatient()
+    void IncomingDataPointToNonExistingPatient() {
+        DataStorage dataStorage = new DataStorage();
+        IncomingDataPoint incomingDataPoint = new IncomingDataPoint(
+                1,100,"Saturation",1000L);
+        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
+
+        MismatchHandler mismatchHandler = new MismatchHandler(
+                new ArrayList<String>(),0,0,0);
+
+        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
+                mismatchHandler);
+
+        DataSourceAdapter adapter = new DataSourceAdapter(identityManager);
+
+        // We try to integrate the incoming data point to our inner server
+        // It will try to validate a match->won't happen->mismatch->mismatch handler documents it
+        adapter.integrateData(incomingDataPoint);
+
+        // Check if we got one mismatch and it was handled correctly by the mismatch handler
+        assertEquals("1,0,0,0", mismatchHandler.getMismatchLog().get(0).toString());
+    }
+
+    @Test
+    void testAddRecordToExistingHospitalPatient()
     {
         DataStorage dataStorage = new DataStorage();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
@@ -114,12 +158,13 @@ public class PatientIdentificationTest {
 
         // If we don't copy we cannot retrieve it
         // We cannot directly retrieve patient data from inner server
+        // We copy the data from inner server and store it for short term use(as deep copy)
         identityManager.copyHospitalPatients();
 
         // There should be 2 records in the patient records:
         // One from the core server, and one from the outside, which was
         // integrated into the core server
-        assertEquals(identityManager.retrieveHospitalPatient(
-                1).getPatientRecords().size(), 2);
+        assertEquals(2, identityManager.retrieveHospitalPatient(
+                1).getPatientRecords().size());
     }
 }

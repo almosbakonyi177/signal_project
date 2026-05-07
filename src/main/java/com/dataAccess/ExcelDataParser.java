@@ -22,9 +22,18 @@ public class ExcelDataParser implements DataParser {
             List<IncomingDataPoint> incomingDataPoints = new ArrayList<>();
             for (int i = 0; i < lines.length; i++) {
                 String line = lines[i];
-                if (line.startsWith("patientId")) continue; // We do not need the header
+                boolean broken = false;
+                if (line.toUpperCase().startsWith("PATIENTID")) continue; // We do not need the header
                 String parts[] = line.split(",");
                 if (parts.length != 4) continue;
+
+                for (String part : parts) {
+                    // If we find broken data (no value for any record value, patientId etc)
+                    // we skip that line
+                    if (part.isEmpty()) broken = true;
+                }
+                if(broken) continue;
+
                 int patientId = Integer.parseInt(parts[0]);
                 double measurement = Double.parseDouble(parts[1]);
                 String recordType = parts[2];

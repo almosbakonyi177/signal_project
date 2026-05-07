@@ -7,8 +7,6 @@ import com.cardio_generator.outputs.OutputStrategy;
  * data generators. It defines the generate function,
  * which every  type of patient data generator needs
  * to implement.
- *
- * @author Almos Bakonyi
  */
 public interface PatientDataGenerator {
     /**

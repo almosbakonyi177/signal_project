@@ -13,7 +13,6 @@ import java.nio.file.StandardOpenOption;
  * such as patient id, timestamp and mostly alert type and status,
  * to a text file in a chosen base directory.x
  *
- * @author Almos Bakonyi
  */
 public class FileOutputStrategy implements OutputStrategy {
 

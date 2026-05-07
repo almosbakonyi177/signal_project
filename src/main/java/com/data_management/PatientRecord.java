@@ -18,7 +18,7 @@ public class PatientRecord {
 
     /**
      * Constructs a new patient record with specified details.
-     * 
+     *
      * @param patientId        the unique identifier for the patient
      * @param measurementValue the numerical value of the recorded measurement
      * @param recordType       the type of measurement (e.g., "ECG", "Blood
@@ -46,7 +46,7 @@ public class PatientRecord {
 
     /**
      * Returns the patient ID associated with this record.
-     * 
+     *
      * @return the patient ID
      */
     public int getPatientId() {
@@ -55,7 +55,7 @@ public class PatientRecord {
 
     /**
      * Returns the measurement value of this record.
-     * 
+     *
      * @return the measurement value
      */
     public double getMeasurementValue() {
@@ -64,7 +64,7 @@ public class PatientRecord {
 
     /**
      * Returns the timestamp when this record was taken.
-     * 
+     *
      * @return the timestamp in milliseconds since epoch
      */
     public long getTimestamp() {
@@ -73,7 +73,7 @@ public class PatientRecord {
 
     /**
      * Returns the type of record (e.g., "ECG", "Blood Pressure").
-     * 
+     *
      * @return the record type
      */
     public String getRecordType() {
@@ -82,6 +82,7 @@ public class PatientRecord {
 
     /**
      * Returns this record's age in days.
+     *
      * @return the days after creation of this record.
      */
     public int getDaysAfterCreation() {

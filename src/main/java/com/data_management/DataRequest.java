@@ -11,4 +11,13 @@ public class DataRequest {
         this.staffId = staffId;
         this.accessGiven = accessGiven;
     }
+    public int getPatientId() {
+        return patientId;
+    }
+    public int getStaffId() {
+        return staffId;
+    }
+    public boolean isAccessGiven() {
+        return accessGiven;
+    }
 }

@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
  * Represents a server which can be set up on a chosen port.
  * To this server we can upload outputs, which contain patient information.
  *
- * @author Almos Bakonyi
  */
 public class TcpOutputStrategy implements OutputStrategy {
 

@@ -25,8 +25,10 @@ public class MismatchHandler {
      * @param simulatorPatientId Integer of patient Id that came from the simulation.
      */
     public void handleMismatch(int simulatorPatientId) {
-        mismatchLog.add(Integer.toString(simulatorPatientId)+
-                ","+Integer.toString(year)+","+Integer.toString(month)+","+Integer.toString(day));
+        if (mismatchLog != null) {
+            mismatchLog.add(Integer.toString(simulatorPatientId) +
+                    "," + Integer.toString(year) + "," + Integer.toString(month) + "," + Integer.toString(day));
+        }
     }
 
     public List<String> getMismatchLog() {

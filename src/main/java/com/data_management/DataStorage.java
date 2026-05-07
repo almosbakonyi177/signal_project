@@ -71,7 +71,7 @@ public class DataStorage {
     public List<PatientRecord> getPatientRecords(int patientId) {
         Patient patient = patientMap.get(patientId);
         if(patient != null) {
-            patient.getAllRecords();
+            return patient.getAllRecords();
         }
         return new ArrayList<>();
     }

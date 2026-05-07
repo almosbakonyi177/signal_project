@@ -10,7 +10,6 @@ import com.cardio_generator.outputs.OutputStrategy;
  * within a healthy and normal level
  * to keep the random generated saturation representative.
  *
- * @author Almos Bakonyi
  */
 public class BloodSaturationDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();

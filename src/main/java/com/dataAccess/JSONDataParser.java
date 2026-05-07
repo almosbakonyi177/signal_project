@@ -30,6 +30,7 @@ public class JSONDataParser implements DataParser {
                 double MeasurementValue =0;
                 String recordType="";
                 long timestamp=0;
+                boolean brokenBlock = false;
 
                 try {
                     int counter = 1;
@@ -38,9 +39,17 @@ public class JSONDataParser implements DataParser {
                         String line = lines[j].trim();
                         int colonIndex = line.indexOf(':');
                         String valuePart = line.substring(colonIndex + 1).trim();
+
                         if (line.endsWith(",")) {
                             valuePart = valuePart.substring(0, valuePart.length() - 1).trim();
                         }
+
+                        // If there is broken data record we skip it
+                        if(valuePart.isEmpty()){
+                            brokenBlock = true;
+                            break;
+                        }
+
                         if (counter == 1) {
                             patientId = Integer.parseInt(valuePart);
                         }
@@ -54,16 +63,34 @@ public class JSONDataParser implements DataParser {
                             }
                         }
                         if (counter == 4) {
+                            if (valuePart.contains("L")){
+                                valuePart = valuePart.substring(0, valuePart.length() - 1).trim();
+                            }
                             timestamp = Long.parseLong(valuePart);
                         }
                         counter++;
                     }
-                    i = i + 4;
-                    IncomingDataPoint incomingDataPoint =
-                            new IncomingDataPoint(
-                                    patientId, MeasurementValue, recordType, timestamp);
+                    if(!brokenBlock) {
+                        i = i + 4;
+                    }
+                    else{
+                        // If there was a broken block, maybe only 3 lines,
+                        // We don't jump 4, we search for the next(hopefully not broken)
+                        // record's start
+                        for(int j = i + 1; j <= i + 5 && j<lines.length; j++){
+                            if(lines[j].trim().startsWith("{")){
+                                i=j;
+                            }
+                        }
+                    }
 
-                    incomingDataPoints.add(incomingDataPoint);
+                    if(!brokenBlock){
+                        IncomingDataPoint incomingDataPoint =
+                                new IncomingDataPoint(
+                                        patientId, MeasurementValue, recordType, timestamp);
+
+                        incomingDataPoints.add(incomingDataPoint);
+                    }
                 }
                 catch (Exception e) {
                     e.printStackTrace();

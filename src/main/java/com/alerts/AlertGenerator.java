@@ -19,6 +19,8 @@ public class AlertGenerator {
     // without a lot of work on the existing code
     private List<AlertCondition> alertConditions = new ArrayList<AlertCondition>();
 
+    private List<String> addToTriggeredAlertsHistory = new ArrayList<>();
+
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -30,11 +32,6 @@ public class AlertGenerator {
      */
     public AlertGenerator(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
-
-        alertConditions.add(new BloodPressureChecker());
-        alertConditions.add(new BloodSaturationChecker());
-        alertConditions.add(new HypotensiveHypoxemiaChecker());
-        alertConditions.add(new ECGPeakChecker());
     }
 
     /**
@@ -56,6 +53,7 @@ public class AlertGenerator {
             if (!alerts.isEmpty()) {
                 for (Alert alert : alerts) {
                     triggerAlert(alert);
+                    addToTriggeredAlertsHistory(alert);
                 }
             }
         }
@@ -73,6 +71,23 @@ public class AlertGenerator {
     private void triggerAlert(Alert alert) {
         alertManager.notifyStaff(alert);
         alertManager.uploadAlert(alert);
+    }
+
+    /**
+     * Adds the alert to the triggered alerts history in String format.
+     * @param alert The alert we want to add to the history.
+     */
+    public void addToTriggeredAlertsHistory(Alert alert) {
+        addToTriggeredAlertsHistory.add(alert.getPatientId()+","+
+                alert.getTimestamp()+","+alert.getType()+","+alert.getCondition());
+    }
+
+    public List<String> getAddToTriggeredAlertsHistory() {
+        return addToTriggeredAlertsHistory;
+    }
+
+    public void addAlertCondition(AlertCondition alertCondition) {
+        this.alertConditions.add(alertCondition);
     }
 
     /**

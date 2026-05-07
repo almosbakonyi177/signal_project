@@ -18,6 +18,7 @@ public class IdentityManager {
     private Map<Integer, HospitalPatient> hospitalPatientMap;
     private DataStorage dataStorage;
     private MismatchHandler mismatchHandler;
+    private PatientRecordComparison comparator;
 
     public IdentityManager(Map<Integer, HospitalPatient> hospitalPatientMap,
                            DataStorage dataStorage,
@@ -28,6 +29,7 @@ public class IdentityManager {
 
         this.dataStorage = dataStorage;
         this.mismatchHandler = mismatchHandler;
+        this.comparator = new PatientRecordComparison();
     }
 
 
@@ -70,6 +72,9 @@ public class IdentityManager {
      * that it got from the simulation, otherwise false.
      */
     public boolean validateMatch(int simulatorPatientId) {
+        // Make sure that we updated our short term use data storage
+        copyHospitalPatients();
+
         if (patientIdentifier.findHospitalPatient(simulatorPatientId) != null) {
             return true;
         }
@@ -92,8 +97,8 @@ public class IdentityManager {
 
     /**
      * Adds the incoming data point to the hospital patient.
-     * @param patientId
-     * @param patientRecord
+     * @param patientId The id of patient to whom the record will be linked.
+     * @param patientRecord The incoming data point transformed to patient record.
      */
     public void addRecord(int patientId, PatientRecord patientRecord) {
         if (!validateMatch(patientId)) {
@@ -102,7 +107,8 @@ public class IdentityManager {
         }
 
         // We add the incoming record to the original patient records.
-        if (!(dataStorage.getPatientRecords(patientId).contains(patientRecord))) {
+        // We add only if it is not in already in the system.
+        if (!(comparator.recordsContain(dataStorage.getPatientRecords(patientId),patientRecord))) {
             dataStorage.addPatientData(patientId, patientRecord.getMeasurementValue(),
                     patientRecord.getRecordType(), patientRecord.getTimestamp());
         }
