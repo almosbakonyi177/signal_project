@@ -1,7 +1,6 @@
 package com.data_management;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -13,8 +12,7 @@ import java.util.List;
 public class Patient {
     private int patientId;
     private List<PatientRecord> patientRecords;
-    // Each patient has their own thresholds for measurement types
-    private HashMap<String, Double> alertThresholds = new HashMap<>();
+
 
     /**
      * Constructs a new Patient with a specified ID.
@@ -47,10 +45,10 @@ public class Patient {
      * Goes through on all the records of this patient and delete the
      * records that are older than 180 days.
      */
-    public void removeOldRecords() {
-        for (PatientRecord record : this.patientRecords) {
-            if (record.getDaysAfterCreation() > 180) {
-                this.patientRecords.remove(record);
+    public void removeOldRecords(long currentTime) {
+        for (int i = patientRecords.size() - 1; i >= 0; i--) {
+            if (this.patientRecords.get(i).getDaysAfterCreation(currentTime) > 180) {
+                this.patientRecords.remove(i);
             }
         }
     }
@@ -88,22 +86,6 @@ public class Patient {
         return patientRecords;
     }
 
-    /**
-     * Returns all the alert thresholds for this patient.
-     * @return all the measurement type and the threshold for them.
-     */
-    public HashMap<String, Double> getAlertThresholds() {
-        return alertThresholds;
-    }
-
-    /**
-     * Adds alert threshold name and threshold value for the patient.
-     * @param measurement The measurement type we want to establish a threshold for.
-     * @param alertThreshold The threshold value.
-     */
-    public void addAlertThreshold(String measurement, double alertThreshold) {
-        this.alertThresholds.put(measurement, alertThreshold);
-    }
 
     /**
      * Returns this patient's patient id.

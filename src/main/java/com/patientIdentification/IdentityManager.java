@@ -40,8 +40,7 @@ public class IdentityManager {
     public void copyHospitalPatients() {
         for (Patient patient : dataStorage.getAllPatients()) {
             HospitalPatient hospitalPatient = new HospitalPatient(patient.getPatientId(),
-                    copyPatientRecords(patient.getPatientId()),
-                    new HashMap<>(patient.getAlertThresholds()));
+                    copyPatientRecords(patient.getPatientId()));
 
             this.hospitalPatientMap.put(patient.getPatientId(), hospitalPatient);
         }

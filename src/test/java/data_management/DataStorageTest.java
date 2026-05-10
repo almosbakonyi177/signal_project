@@ -44,6 +44,52 @@ class DataStorageTest {
 
 
     @Test
+    void testGetAllPatients() {
+        DataStorage storage = new DataStorage();
+        storage.addPatientData(1, 100.0,
+                "WhiteBloodCells", 1714376789050L);
+        storage.addPatientData(2, 10.0,
+                "WhiteBloodCells", 1714376789051L);
+
+        assertEquals(2, storage.getAllPatients().size());
+        assertEquals(2, storage.getAllPatients().get(1).getPatientId());
+    }
+
+
+    /**
+     * Edge case: What happens if we want to get a non existing patient's records
+     */
+    @Test
+    void testGetNonExistingPatientRecords(){
+        DataStorage storage = new DataStorage();
+        // It should be an empty array list, but not null
+        assertEquals(0, storage.getPatientRecords(1).size());
+        assertNotNull(storage.getPatientRecords(1));
+    }
+
+
+    @Test
+    void testAddPatientRecord() {
+        Patient patient = new Patient(1);
+        patient.addRecord(90, "SystolicPressure", 1814376789051L);
+        patient.addRecord(100,"DiastolicPressure", 1814376789053L);
+
+        assertEquals(2, patient.getAllRecords().size());
+        assertEquals(90, patient.getAllRecords().get(0).getMeasurementValue());
+    }
+
+
+    @Test
+    void testRemoveOldRecords() {
+        Patient patient = new Patient(1);
+        patient.addRecord(90, "SystolicPressure", 0L);
+        patient.addRecord(20, "SystolicPressure", 1L);
+        patient.removeOldRecords(20000000000L);
+        assertEquals(0, patient.getAllRecords().size());
+    }
+
+
+    @Test
     void testAuditLoggerAddRequest() {
         AuditLogger auditLogger = new AuditLogger();
         auditLogger.addRequest(1,1,false);
@@ -51,21 +97,6 @@ class DataStorageTest {
 
         assertEquals(2, auditLogger.getRequests().size());
     }
-
-
-    @Test
-    void AddPatientRecord() {
-        Patient patient = new Patient(1);
-        patient.addRecord(90, "SystolicPressure", 1814376789051L);
-        patient.addRecord(100,"DiastolicPressure", 1814376789053L);
-
-        assertEquals(patient.getAllRecords().size(), 2);
-        assertEquals(patient.getAllRecords().get(0).getMeasurementValue(), 90);
-    }
-
-
-
-
 
 
     // Integration tests
@@ -114,8 +145,8 @@ class DataStorageTest {
 
 
         List<PatientRecord> records = dataRetriever.makeQuery(staffMember,1);
-        assertEquals(null, records); // Should be no retrieved data because no access
-        assertEquals(false, dataRetriever.getAuditLogger().getRequests().get(0).isAccessGiven());
+        assertNull(records); // Should be no retrieved data because no access
+        assertFalse(dataRetriever.getAuditLogger().getRequests().get(0).isAccessGiven());
     }
 
 
@@ -135,12 +166,12 @@ class DataStorageTest {
         StaffMember staffMember = storage.getStaffMembers().get(1);
 
         List<PatientRecord> records = dataRetriever.makeQuery(staffMember,1);
-        assertEquals(null, records);
+        assertNull(records);
     }
 
 
     @Test
-    void deletedStaffMemberDataRequest() {
+    void testdeletedStaffMemberDataRequest() {
         DataStorage storage = new DataStorage();
         storage.addStaffMemberData(1,"Lucas", "Man",3);
         DataRetriever dataRetriever = new DataRetriever(storage,2);

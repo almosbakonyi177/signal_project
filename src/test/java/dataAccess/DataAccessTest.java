@@ -151,7 +151,7 @@ public class DataAccessTest {
         DataStorage dataStorage = new DataStorage();
         IdentityManager identityManager =
                 new IdentityManager(patients, dataStorage,
-                        new MismatchHandler(null,0,0,0));
+                        new MismatchHandler(null,0));
 
 
         // Need to add at least one record, in order to have the patient in the server

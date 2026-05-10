@@ -14,7 +14,6 @@ public class PatientRecord {
     private String recordType; // Example: ECG, blood pressure, etc.
     private double measurementValue; // Example: heart rate
     private long timestamp;
-    private int daysAfterCreation;
 
     /**
      * Constructs a new patient record with specified details.
@@ -31,16 +30,6 @@ public class PatientRecord {
         this.measurementValue = measurementValue;
         this.recordType = recordType;
         this.timestamp = timestamp;
-        this.daysAfterCreation = 0;
-    }
-
-
-    /**
-     * Needs to be called once a day after the patient record had been created.
-     * Manages the patient record aging.
-     */
-    public void updateDays() {
-        this.daysAfterCreation++;
     }
 
 
@@ -85,7 +74,8 @@ public class PatientRecord {
      *
      * @return the days after creation of this record.
      */
-    public int getDaysAfterCreation() {
-        return daysAfterCreation;
+    public int getDaysAfterCreation(long currentTime) {
+        return
+                (int)Math.floor((currentTime-timestamp)/86400000L);
     }
 }

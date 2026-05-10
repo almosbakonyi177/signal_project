@@ -11,14 +11,11 @@ import java.util.List;
 public class HospitalPatient {
     private int patientId;
     private List<PatientRecord> patientRecords;
-    // Each patient has their own thresholds for measurement types
-    private HashMap<String, Double> alertThresholds = new HashMap<>();
 
-    public HospitalPatient(int patientId,  List<PatientRecord> patientRecords,
-                           HashMap<String, Double> alertThresholds) {
+
+    public HospitalPatient(int patientId,  List<PatientRecord> patientRecords) {
         this.patientId = patientId;
         this.patientRecords = patientRecords;
-        this.alertThresholds = alertThresholds;
     }
 
     /**

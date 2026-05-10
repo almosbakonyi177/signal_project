@@ -24,7 +24,7 @@ public class PatientIdentificationTest {
     {
         DataStorage dataStorage = new DataStorage();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
-        HospitalPatient patient = new HospitalPatient(1, null, null);
+        HospitalPatient patient = new HospitalPatient(1, null);
 
 
         hospital_patients.put(1, patient);
@@ -47,7 +47,7 @@ public class PatientIdentificationTest {
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                new MismatchHandler(null, 0,0,0));
+                new MismatchHandler(null, 0));
 
 
         assertFalse(identityManager.validateMatch(1));
@@ -59,9 +59,9 @@ public class PatientIdentificationTest {
     {
         DataStorage dataStorage = new DataStorage();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
-        HospitalPatient patient = new HospitalPatient(1, null, null);
+        HospitalPatient patient = new HospitalPatient(1, null);
         MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>(),
-                0,0,0);
+                0);
 
         hospital_patients.put(1, patient);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
@@ -83,7 +83,7 @@ public class PatientIdentificationTest {
 
         identityManager.copyHospitalPatients();
         HospitalPatient patient = identityManager.retrieveHospitalPatient(1);
-        assertTrue(patient!=null);
+        assertNotNull(patient);
     }
 
 
@@ -94,8 +94,7 @@ public class PatientIdentificationTest {
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         List<String> log = new ArrayList<>();
 
-        MismatchHandler mismatchHandler = new MismatchHandler(log, 2026,
-                5,1);
+        MismatchHandler mismatchHandler = new MismatchHandler(log, 10000L);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
                 mismatchHandler);
         identityManager.validateMatch(2);
@@ -112,7 +111,7 @@ public class PatientIdentificationTest {
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
         MismatchHandler mismatchHandler = new MismatchHandler(
-                new ArrayList<String>(),0,0,0);
+                new ArrayList<String>(),0);
 
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
                 mismatchHandler);
@@ -124,7 +123,7 @@ public class PatientIdentificationTest {
         adapter.integrateData(incomingDataPoint);
 
         // Check if we got one mismatch and it was handled correctly by the mismatch handler
-        assertEquals("1,0,0,0", mismatchHandler.getMismatchLog().get(0).toString());
+        assertEquals("1,0", mismatchHandler.getMismatchLog().get(0));
     }
 
     @Test
@@ -141,8 +140,7 @@ public class PatientIdentificationTest {
         IncomingDataPoint data = new IncomingDataPoint(1,0,
                 "Saturation", 1000);
 
-        MismatchHandler mismatchHandler = new MismatchHandler(log, 2026,
-                5,1);
+        MismatchHandler mismatchHandler = new MismatchHandler(log, 2000L);
 
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
                 mismatchHandler);

@@ -9,15 +9,11 @@ import java.util.Set;
  */
 public class MismatchHandler {
     private List<String> mismatchLog;
-    private int year;
-    private int month;
-    private int day;
+    private long timeStamp;
 
-    public MismatchHandler(List<String> mismatchLog, int year, int month, int day) {
+    public MismatchHandler(List<String> mismatchLog, long timeStamp) {
         this.mismatchLog = mismatchLog;
-        this.year = year;
-        this.month = month;
-        this.day = day;
+        this.timeStamp = timeStamp;
     }
 
     /**
@@ -27,7 +23,7 @@ public class MismatchHandler {
     public void handleMismatch(int simulatorPatientId) {
         if (mismatchLog != null) {
             mismatchLog.add(Integer.toString(simulatorPatientId) +
-                    "," + Integer.toString(year) + "," + Integer.toString(month) + "," + Integer.toString(day));
+                    "," + Long.toString(timeStamp));
         }
     }
 
@@ -35,28 +31,8 @@ public class MismatchHandler {
         return this.mismatchLog;
     }
 
-    /**
-     * Setter for the year.
-     * @param year The current year.
-     */
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    /**
-     * Setter for the month.
-     * @param month The current month.
-     */
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    /**
-     * Setter for the day.
-     * @param day The current day.
-     */
-    public void setDay(int day) {
-        this.day = day;
+    public void setTime(long time) {
+        this.timeStamp=time;
     }
 
 }

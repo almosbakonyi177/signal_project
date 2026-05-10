@@ -14,6 +14,7 @@ import java.util.ArrayList;
  */
 public class AlertGeneratorTest {
 
+
     @Test
     public void testIncreaseSystolic() {
         Patient patient = new Patient(1);
@@ -28,8 +29,48 @@ public class AlertGeneratorTest {
 
 
     @Test
-    public void testCriticalSystolic() {
-        // Edge case, should happen more alert
+    public void testDecreaseSystolic() {
+        Patient patient = new Patient(1);
+        patient.addRecord(160,"SystolicPressure", 1000L);
+        patient.addRecord(140,"SystolicPressure", 10000L);
+        patient.addRecord(120,"SystolicPressure", 20000L);
+        patient.addRecord(100,"SystolicPressure", 21000L);
+        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
+        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        assertEquals(1, alerts.size()); // Check if there was only one alert
+        assertEquals("DecreaseTrendSystolic", alerts.get(0).getCondition());
+    }
+
+
+    @Test
+    public void testCriticalHighSystolic() {
+        Patient patient = new Patient(1);
+        patient.addRecord(198,"SystolicPressure", 20100L);
+        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
+        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        assertEquals(1, alerts.size());
+        assertEquals("CriticalHighSystolic", alerts.get(0).getCondition());
+    }
+
+
+    @Test
+    public void testCriticalLowSystolic() {
+        Patient patient = new Patient(1);
+        // Healthy systolic is between 90 and 180
+        patient.addRecord(80,"SystolicPressure", 20100L);
+        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
+        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        assertEquals(1, alerts.size());
+        assertEquals("CriticalLowSystolic", alerts.get(0).getCondition());
+    }
+
+
+    /**
+     * Edge case: what happens when there are critical high systolic pressures and
+     * an increasing trend.
+     */
+    @Test
+    public void testSeveralSystolicAlerts() {
         Patient patient = new Patient(1);
         patient.addRecord(100,"SystolicPressure", 1000L);
         patient.addRecord(120,"SystolicPressure", 10000L);
@@ -43,12 +84,54 @@ public class AlertGeneratorTest {
 
 
     @Test
-    public void testCriticalDiastolic() {
+    public void testIncreaseDiastolic() {
         Patient patient = new Patient(1);
-        patient.addRecord(10,"DiastolicPressure", 1000L);
+        patient.addRecord(65,"DiastolicPressure", 1000L);
+        patient.addRecord(85,"DiastolicPressure", 10000L);
+        patient.addRecord(105,"DiastolicPressure", 20000L);
+        patient.addRecord(118,"DiastolicPressure", 20100L);
         BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
         ArrayList alerts = bloodPressureChecker.check(patient);
+        assertEquals(1, alerts.size()); // Check if there was only one alert
+    }
+
+
+    @Test
+    public void testDecreaseDiastolic() {
+        Patient patient = new Patient(1);
+        patient.addRecord(119,"DiastolicPressure", 1000L);
+        patient.addRecord(100,"DiastolicPressure", 10000L);
+        patient.addRecord(85,"DiastolicPressure", 20000L);
+        patient.addRecord(65,"DiastolicPressure", 21000L);
+        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
+        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        assertEquals(1, alerts.size()); // Check if there was only one alert
+        assertEquals("DecreaseTrendDiastolic", alerts.get(0).getCondition());
+    }
+
+    @Test
+    public void testCriticalLowDiastolic() {
+        Patient patient = new Patient(1);
+        // Healthy diastolic between 60 and 120
+        patient.addRecord(55,"DiastolicPressure", 1000L);
+        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
+        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
         assertEquals(1, alerts.size()); // Check if there was one alert
+        assertEquals("CriticalLowDiastolic", alerts.get(0).getCondition());
+        // Check if the alert is correct
+    }
+
+
+    @Test
+    public void testCriticalHighDiastolic() {
+        Patient patient = new Patient(1);
+        // Healthy diastolic between 60 and 120
+        patient.addRecord(130,"DiastolicPressure", 1000L);
+        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
+        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        assertEquals(1, alerts.size()); // Check if there was one alert
+        assertEquals("CriticalHighDiastolic", alerts.get(0).getCondition());
+        // Check if the alert is correct
     }
 
 
@@ -91,13 +174,36 @@ public class AlertGeneratorTest {
     public void testSaturationCriticalLow() {
         // Edge case, should happen more alert
         Patient patient = new Patient(1);
-        patient.addRecord(100,"Saturation", 1000L);
         patient.addRecord(90,"Saturation", 1000000L);//One million
+        BloodSaturationChecker bloodSaturationChecker = new BloodSaturationChecker();
+        ArrayList<Alert> alerts = bloodSaturationChecker.check(patient);
+        assertEquals(1, alerts.size());
+        assertEquals("BloodSaturationLow", alerts.get(0).getCondition());
+        // Check if we got the correct alert condition
+    }
+
+
+    /**
+     * Edge case: What happens if there is a critical low and then a drop in 5 mins.
+     */
+    @Test
+    public void testSaturationCriticalLowAndDrop() {
+        // Edge case, should happen more alert
+        Patient patient = new Patient(1);
+        patient.addRecord(100,"Saturation", 1000L);
+
+        // Will generate first error:Critical Low
+        patient.addRecord(90,"Saturation", 1000000L);//One million
+
+        // Second error: Drop in 5mins
         patient.addRecord(100,"Saturation", 5000000L);
         patient.addRecord(94,"Saturation", 5010000L);
+
         BloodSaturationChecker bloodSaturationChecker = new BloodSaturationChecker();
-        ArrayList alerts = bloodSaturationChecker.check(patient);
+        ArrayList<Alert> alerts = bloodSaturationChecker.check(patient);
         assertEquals(2, alerts.size());
+        assertEquals("BloodSaturationLow", alerts.get(0).getCondition());
+        assertEquals("BloodSaturationDrop", alerts.get(1).getCondition());
     }
 
 
