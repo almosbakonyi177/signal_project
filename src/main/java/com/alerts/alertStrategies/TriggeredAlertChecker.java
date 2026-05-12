@@ -1,6 +1,7 @@
-package com.alerts.checkers;
+package com.alerts.alertStrategies;
 
 import com.alerts.Alert;
+import com.alerts.checkers.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 /**
  *
  */
-public class TriggeredAlertChecker implements AlertCondition {
+public class TriggeredAlertChecker implements AlertStrategy {
     /**
      *
      * @param patient

@@ -1,6 +1,7 @@
-package com.alerts.checkers;
+package com.alerts.alertStrategies;
 
 import com.alerts.Alert;
+import com.alerts.checkers.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * low blood saturation levels, therefore the patient is in danger of
  * Hypotensive Hypoxemia
  */
-public class HypotensiveHypoxemiaChecker implements AlertCondition {
+public class HypotensiveHypoxemiaChecker implements AlertStrategy {
 
     /**
      * Checks if the given patient is in danger of HypotensiveHypoxemia.

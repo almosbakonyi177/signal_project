@@ -1,4 +1,4 @@
-package com.alerts.checkers;
+package com.alerts.alertStrategies;
 
 /**
  * Responsible for checking if measurement values exceeds

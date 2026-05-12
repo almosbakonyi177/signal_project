@@ -1,6 +1,10 @@
-package com.alerts.checkers;
+package com.alerts.alertStrategies;
 
 import com.alerts.Alert;
+import com.alerts.alertFactory.AlertFactory;
+import com.alerts.alertFactory.BloodOxygenAlertFactory;
+import com.alerts.alertFactory.ECGAlertFactory;
+import com.alerts.checkers.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
@@ -26,12 +30,14 @@ public class OxygenSaturationStrategy implements AlertStrategy {
         double lastValue = 0;
         boolean firstCheck = true;
 
+        AlertFactory alertFactory = new BloodOxygenAlertFactory();
+
         for (PatientRecord record : patient.getAllRecords()) {
             if (record.getRecordType().equals("Saturation")) {
                 if (record.getMeasurementValue() < 92) {
                     problem = "BloodSaturationLow";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            record.getTimestamp(), "BloodSaturation");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, record.getTimestamp());
                     alerts.add(alert);
                 }
                 if(!firstCheck) {
@@ -39,8 +45,8 @@ public class OxygenSaturationStrategy implements AlertStrategy {
                             record.getTimestamp() - lastTimeStamp < 600000) {
 
                         problem = "BloodSaturationDrop";
-                        Alert alert = new Alert(patient.getPatientId(), problem,
-                                record.getTimestamp(), "BloodSaturation");
+                        Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                                problem, record.getTimestamp());
                         alerts.add(alert);
                     }
                 }

@@ -3,10 +3,10 @@ package alerts;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.alerts.*;
-import com.alerts.checkers.BloodPressureStrategy;
-import com.alerts.checkers.OxygenSaturationStrategy;
-import com.alerts.checkers.ECGPeakChecker;
-import com.alerts.checkers.HypotensiveHypoxemiaChecker;
+import com.alerts.alertStrategies.BloodPressureStrategy;
+import com.alerts.alertStrategies.OxygenSaturationStrategy;
+import com.alerts.alertStrategies.ECGPeakStrategy;
+import com.alerts.alertStrategies.HypotensiveHypoxemiaChecker;
 import com.data_management.DataStorage;
 import org.junit.jupiter.api.Test;
 import com.data_management.Patient;
@@ -230,8 +230,8 @@ public class AlertGeneratorTest {
         patient.addRecord(100,"ECG", 2000000L);//Million
         patient.addRecord(110,"ECG", 2010000L);//Million
         patient.addRecord(180,"ECG", 2020000L);//Million
-        ECGPeakChecker ecgPeakChecker = new ECGPeakChecker();
-        ArrayList alerts = ecgPeakChecker.check(patient);
+        ECGPeakStrategy ecgPeakStrategy = new ECGPeakStrategy();
+        ArrayList alerts = ecgPeakStrategy.check(patient);
         assertEquals(1, alerts.size());
     }
 
@@ -296,7 +296,7 @@ public class AlertGeneratorTest {
 
 
         alertGenerator.addAlertCondition(new HypotensiveHypoxemiaChecker());
-        alertGenerator.addAlertCondition(new ECGPeakChecker());
+        alertGenerator.addAlertCondition(new ECGPeakStrategy());
         alertGenerator.evaluateData(storage.getPatientById(1));
 
         assertEquals("1,10000,HypotensiveHypoxemia,danger",

@@ -1,8 +1,9 @@
-package com.alerts.checkers;
+package com.alerts.alertStrategies;
 
 import com.alerts.Alert;
 import com.alerts.alertFactory.AlertFactory;
 import com.alerts.alertFactory.BloodPressureAlertFactory;
+import com.alerts.checkers.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 

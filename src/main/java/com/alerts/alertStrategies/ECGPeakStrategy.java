@@ -1,6 +1,10 @@
-package com.alerts.checkers;
+package com.alerts.alertStrategies;
 
 import com.alerts.Alert;
+import com.alerts.alertFactory.AlertFactory;
+import com.alerts.alertFactory.BloodPressureAlertFactory;
+import com.alerts.alertFactory.ECGAlertFactory;
+import com.alerts.checkers.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
@@ -10,10 +14,10 @@ import java.util.ArrayList;
  * Responsible for checking if a patient's ECG values are at peak in
  * a reasonable time interval.
  */
-public class ECGPeakChecker implements AlertCondition {
+public class ECGPeakStrategy implements AlertStrategy {
     /**
-     *
-     * @param patient
+     * Checks if the patient has an ECG peak value within one hour.
+     * @param patient The id of patient whom data is being checked for ECG peaks.
      * @return List of alerts that need to be triggered, if there was any,
       * otherwise an empty list.
      */
@@ -24,6 +28,8 @@ public class ECGPeakChecker implements AlertCondition {
         long timeStampLimit = 3600000;
         ArrayList<Long> ECGTimeStamps = new ArrayList<Long>();
         ArrayList<Double> ECGValues = new ArrayList<Double>();
+
+        AlertFactory alertFactory = new ECGAlertFactory();
 
         ArrayList<Alert> alerts = new ArrayList<>();
 
@@ -42,8 +48,8 @@ public class ECGPeakChecker implements AlertCondition {
                         ECGTimeStamps.add(record.getTimestamp());
                     } else {
                         if (checkIfPeak(calculateAverage(ECGValues), record.getMeasurementValue())) {
-                            Alert alert = new Alert(patient.getPatientId(),"Peak",
-                                    record.getTimestamp(),record.getRecordType());
+                            Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                                    "Peak", record.getTimestamp());
                             alerts.add(alert);
                         }
                     }

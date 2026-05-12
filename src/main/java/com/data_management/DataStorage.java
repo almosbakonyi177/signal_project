@@ -89,7 +89,7 @@ public class DataStorage {
 
     /**
      * Retrieves a collection of all staff members stored in the data storage.
-     * @return list of all stuff members.
+     * @return Map of all stuff members.
      */
     public Map<Integer, StaffMember> getStaffMembers() {
         return staffMemberMap;
@@ -98,7 +98,7 @@ public class DataStorage {
     /**
      * Adds a staff member to the list.
      * It can happen if someone resigns or gets fired.
-     * @param staffMemberId
+     * @param staffMemberId The id of staff member who is being added to the system.
      */
     public void addStaffMemberData(int staffMemberId, String firstname,
                                    String lastname, int roleLevel) {
