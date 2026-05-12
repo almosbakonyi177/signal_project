@@ -1,16 +1,16 @@
-package com.alerts;
+package com.alerts.checkers;
 
+import com.alerts.Alert;
 import com.data_management.Patient;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents the basis for a condition checker method.
  * Any checker(Blood pressure checker, etc) will check if the measurement
  * meets the alert trigger requirements.
  */
-public interface AlertCondition {
+public interface AlertStrategy {
     /** Checks if the patient meets any requirement to trigger an alert.
      * For example extremely low blood pressure.
      * @param patient

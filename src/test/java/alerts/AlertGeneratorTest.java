@@ -3,6 +3,10 @@ package alerts;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.alerts.*;
+import com.alerts.checkers.BloodPressureStrategy;
+import com.alerts.checkers.OxygenSaturationStrategy;
+import com.alerts.checkers.ECGPeakChecker;
+import com.alerts.checkers.HypotensiveHypoxemiaChecker;
 import com.data_management.DataStorage;
 import org.junit.jupiter.api.Test;
 import com.data_management.Patient;
@@ -22,8 +26,8 @@ public class AlertGeneratorTest {
         patient.addRecord(120,"SystolicPressure", 10000L);
         patient.addRecord(131,"SystolicPressure", 20000L);
         patient.addRecord(142,"SystolicPressure", 20100L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size()); // Check if there was only one alert
     }
 
@@ -35,8 +39,8 @@ public class AlertGeneratorTest {
         patient.addRecord(140,"SystolicPressure", 10000L);
         patient.addRecord(120,"SystolicPressure", 20000L);
         patient.addRecord(100,"SystolicPressure", 21000L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList<Alert> alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size()); // Check if there was only one alert
         assertEquals("DecreaseTrendSystolic", alerts.get(0).getCondition());
     }
@@ -46,8 +50,8 @@ public class AlertGeneratorTest {
     public void testCriticalHighSystolic() {
         Patient patient = new Patient(1);
         patient.addRecord(198,"SystolicPressure", 20100L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList<Alert> alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size());
         assertEquals("CriticalHighSystolic", alerts.get(0).getCondition());
     }
@@ -58,8 +62,8 @@ public class AlertGeneratorTest {
         Patient patient = new Patient(1);
         // Healthy systolic is between 90 and 180
         patient.addRecord(80,"SystolicPressure", 20100L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList<Alert> alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size());
         assertEquals("CriticalLowSystolic", alerts.get(0).getCondition());
     }
@@ -76,8 +80,8 @@ public class AlertGeneratorTest {
         patient.addRecord(120,"SystolicPressure", 10000L);
         patient.addRecord(185,"SystolicPressure", 20000L);
         patient.addRecord(198,"SystolicPressure", 20100L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList alerts = bloodPressureStrategy.check(patient);
         assertEquals(3, alerts.size()); // Check if there were 3 alerts:
                                             // 1 for increasing trend, 2 for critical high value
     }
@@ -90,8 +94,8 @@ public class AlertGeneratorTest {
         patient.addRecord(85,"DiastolicPressure", 10000L);
         patient.addRecord(105,"DiastolicPressure", 20000L);
         patient.addRecord(118,"DiastolicPressure", 20100L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size()); // Check if there was only one alert
     }
 
@@ -103,8 +107,8 @@ public class AlertGeneratorTest {
         patient.addRecord(100,"DiastolicPressure", 10000L);
         patient.addRecord(85,"DiastolicPressure", 20000L);
         patient.addRecord(65,"DiastolicPressure", 21000L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList<Alert> alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size()); // Check if there was only one alert
         assertEquals("DecreaseTrendDiastolic", alerts.get(0).getCondition());
     }
@@ -114,8 +118,8 @@ public class AlertGeneratorTest {
         Patient patient = new Patient(1);
         // Healthy diastolic between 60 and 120
         patient.addRecord(55,"DiastolicPressure", 1000L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList<Alert> alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size()); // Check if there was one alert
         assertEquals("CriticalLowDiastolic", alerts.get(0).getCondition());
         // Check if the alert is correct
@@ -127,8 +131,8 @@ public class AlertGeneratorTest {
         Patient patient = new Patient(1);
         // Healthy diastolic between 60 and 120
         patient.addRecord(130,"DiastolicPressure", 1000L);
-        BloodPressureChecker bloodPressureChecker = new BloodPressureChecker();
-        ArrayList<Alert> alerts = bloodPressureChecker.check(patient);
+        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
+        ArrayList<Alert> alerts = bloodPressureStrategy.check(patient);
         assertEquals(1, alerts.size()); // Check if there was one alert
         assertEquals("CriticalHighDiastolic", alerts.get(0).getCondition());
         // Check if the alert is correct
@@ -147,8 +151,8 @@ public class AlertGeneratorTest {
         patient.addRecord(94,"Saturation", 5010000L);
         // There was a drop in ten mins
 
-        BloodSaturationChecker bloodSaturationChecker = new BloodSaturationChecker();
-        ArrayList alerts = bloodSaturationChecker.check(patient);
+        OxygenSaturationStrategy oxygenSaturationStrategy = new OxygenSaturationStrategy();
+        ArrayList alerts = oxygenSaturationStrategy.check(patient);
 
         assertEquals(1, alerts.size());
         // Check if there was one alert:
@@ -163,8 +167,8 @@ public class AlertGeneratorTest {
         patient.addRecord(94,"Saturation", 1000000L);//One million
         // There was a more than 5% drop but passed more than 10 mins
 
-        BloodSaturationChecker bloodSaturationChecker = new BloodSaturationChecker();
-        ArrayList alerts = bloodSaturationChecker.check(patient);
+        OxygenSaturationStrategy oxygenSaturationStrategy = new OxygenSaturationStrategy();
+        ArrayList alerts = oxygenSaturationStrategy.check(patient);
 
         assertEquals(0, alerts.size());
     }
@@ -175,8 +179,8 @@ public class AlertGeneratorTest {
         // Edge case, should happen more alert
         Patient patient = new Patient(1);
         patient.addRecord(90,"Saturation", 1000000L);//One million
-        BloodSaturationChecker bloodSaturationChecker = new BloodSaturationChecker();
-        ArrayList<Alert> alerts = bloodSaturationChecker.check(patient);
+        OxygenSaturationStrategy oxygenSaturationStrategy = new OxygenSaturationStrategy();
+        ArrayList<Alert> alerts = oxygenSaturationStrategy.check(patient);
         assertEquals(1, alerts.size());
         assertEquals("BloodSaturationLow", alerts.get(0).getCondition());
         // Check if we got the correct alert condition
@@ -199,8 +203,8 @@ public class AlertGeneratorTest {
         patient.addRecord(100,"Saturation", 5000000L);
         patient.addRecord(94,"Saturation", 5010000L);
 
-        BloodSaturationChecker bloodSaturationChecker = new BloodSaturationChecker();
-        ArrayList<Alert> alerts = bloodSaturationChecker.check(patient);
+        OxygenSaturationStrategy oxygenSaturationStrategy = new OxygenSaturationStrategy();
+        ArrayList<Alert> alerts = oxygenSaturationStrategy.check(patient);
         assertEquals(2, alerts.size());
         assertEquals("BloodSaturationLow", alerts.get(0).getCondition());
         assertEquals("BloodSaturationDrop", alerts.get(1).getCondition());
@@ -254,8 +258,8 @@ public class AlertGeneratorTest {
         storage.addPatientData(
                 1,10,"DiastolicPressure", 2000000L);
 
-        alertGenerator.addAlertCondition(new BloodSaturationChecker());
-        alertGenerator.addAlertCondition(new BloodPressureChecker());
+        alertGenerator.addAlertCondition(new OxygenSaturationStrategy());
+        alertGenerator.addAlertCondition(new BloodPressureStrategy());
         alertGenerator.evaluateData(storage.getPatientById(1));
 
         // We first check the Saturation in the evaluation method.

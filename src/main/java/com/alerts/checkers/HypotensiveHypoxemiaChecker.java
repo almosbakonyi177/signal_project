@@ -1,5 +1,6 @@
-package com.alerts;
+package com.alerts.checkers;
 
+import com.alerts.Alert;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 

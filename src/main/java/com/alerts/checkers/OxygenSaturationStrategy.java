@@ -1,17 +1,17 @@
-package com.alerts;
+package com.alerts.checkers;
 
+import com.alerts.Alert;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Responsible for checking if the patient's Blood Saturation level
  * is too low or dropped more than 5% in 10 minutes. If any of these requirements
  * happens then we need to trigger an alert.
  */
-public class BloodSaturationChecker implements AlertCondition{
+public class OxygenSaturationStrategy implements AlertStrategy {
 
     /**
      * Checks

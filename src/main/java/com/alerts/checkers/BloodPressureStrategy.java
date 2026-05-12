@@ -1,14 +1,16 @@
-package com.alerts;
+package com.alerts.checkers;
 
+import com.alerts.Alert;
+import com.alerts.alertFactory.AlertFactory;
+import com.alerts.alertFactory.BloodPressureAlertFactory;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
-import java.util.List;
 
 // Responsible for checking if the patients' blood pressure
 // data meet the requirements to trigger an alert.
-public class BloodPressureChecker implements AlertCondition {
+public class BloodPressureStrategy implements AlertStrategy {
 
     /**
      * Checks if the patient's blood pressure measurements are
@@ -22,6 +24,7 @@ public class BloodPressureChecker implements AlertCondition {
     public ArrayList<Alert> check(Patient patient) {
         ArrayList<Alert> alerts = new ArrayList<>();
         String problem ="";
+        AlertFactory alertFactory = new BloodPressureAlertFactory();
 
         ValueChecker checker = new ValueChecker();
         boolean firstSystolic = true;
@@ -41,15 +44,20 @@ public class BloodPressureChecker implements AlertCondition {
                 // First check if there is a critical outstanding
                 if (checker.valueCheck(patientRecord.getMeasurementValue(),
                         180,true)) {
+
                     problem = "CriticalHighSystolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(), "BloodPressure");
+                    // We call the alert factory to create the correct alert
+                    // (without knowing which exact factory and which exact alert right here
+                    // Because it decides it, we just use, polymorphism)
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
+
                 if (checker.valueCheck(patientRecord.getMeasurementValue(),90,false)) {
                     problem = "CriticalLowSystolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(),  "BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
 
@@ -79,15 +87,15 @@ public class BloodPressureChecker implements AlertCondition {
 
                 if (increaseCounterSystolic>2) {
                     problem = "IncreaseTrendSystolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(), "BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
 
                 if(decreaseCounterSystolic>2) {
                     problem = "DecreaseTrendSystolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(),  "BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
 
@@ -98,14 +106,14 @@ public class BloodPressureChecker implements AlertCondition {
                 // First check if there is a critical outstanding
                 if (checker.valueCheck(patientRecord.getMeasurementValue(),120,true)) {
                     problem = "CriticalHighDiastolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(),  "BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
                 if (checker.valueCheck(patientRecord.getMeasurementValue(),60,false)) {
                     problem = "CriticalLowDiastolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(),   "BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
 
@@ -135,14 +143,14 @@ public class BloodPressureChecker implements AlertCondition {
 
                 if (increaseCounterDiastolic>2) {
                     problem = "IncreaseTrendDiastolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(),"BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
                 if(decreaseCounterDiastolic>2) {
                     problem = "DecreaseTrendDiastolic";
-                    Alert alert = new Alert(patient.getPatientId(), problem,
-                            patientRecord.getTimestamp(),"BloodPressure");
+                    Alert alert = alertFactory.createAlert(patient.getPatientId(),
+                            problem, patientRecord.getTimestamp());
                     alerts.add(alert);
                 }
 

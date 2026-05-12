@@ -4,7 +4,7 @@ package com.alerts;
  * Represents an alert, which shows the type and condition of a problem(High blood pressure etc),
  * links these data to the patient and time when it occurred.
  */
-public class Alert {
+public abstract class Alert {
     private int patientId;
     private String condition;
     private String alertType;

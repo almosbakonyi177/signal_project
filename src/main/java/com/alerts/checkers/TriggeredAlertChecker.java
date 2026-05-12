@@ -1,15 +1,15 @@
-package com.alerts;
+package com.alerts.checkers;
 
+import com.alerts.Alert;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  */
-public class TriggeredAlertChecker implements AlertCondition{
+public class TriggeredAlertChecker implements AlertCondition {
     /**
      *
      * @param patient

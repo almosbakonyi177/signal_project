@@ -35,6 +35,24 @@ public class HealthDataSimulator {
     private static ScheduledExecutorService scheduler;
     private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
     private static final Random random = new Random();
+    private static HealthDataSimulator instance;
+
+    private HealthDataSimulator() {
+
+    }
+
+    /**
+     * Returns the only existing HealthDataSimulator in the program.
+     * If no Health Data Simulator exists, it creates one. Implements Singleton design pattern.
+     * @return The only existing HealthDataSimulator in the program if exists one,
+     * otherwise it creates one.
+     */
+    public HealthDataSimulator getInstance() {
+        if (instance == null) {
+            return new HealthDataSimulator();
+        }
+        return this;
+    }
 
     public static void main(String[] args) throws IOException {
 

@@ -1,16 +1,16 @@
-package com.alerts;
+package com.alerts.checkers;
 
+import com.alerts.Alert;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Responsible for checking if a patient's ECG values are at peak in
  * a reasonable time interval.
  */
-public class ECGPeakChecker implements AlertCondition{
+public class ECGPeakChecker implements AlertCondition {
     /**
      *
      * @param patient

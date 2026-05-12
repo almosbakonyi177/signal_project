@@ -1,5 +1,7 @@
 package com.alerts;
 
+import com.alerts.checkers.AlertStrategy;
+import com.alerts.checkers.AlertStrategy;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 
@@ -17,7 +19,7 @@ public class AlertGenerator {
     private AlertManager alertManager = new AlertManager();
     // Store checking methods in a list, therefore we can add a new checking method anytime
     // without a lot of work on the existing code
-    private List<AlertCondition> alertConditions = new ArrayList<AlertCondition>();
+    private List<AlertStrategy> alertStrategies = new ArrayList<AlertStrategy>();
 
     private List<String> addToTriggeredAlertsHistory = new ArrayList<>();
 
@@ -47,7 +49,7 @@ public class AlertGenerator {
     public void evaluateData(Patient patient) {
 
         // We go through on all checking methods
-        for (AlertCondition alertCondition : alertConditions) {
+        for (AlertStrategy alertCondition : alertStrategies) {
             ArrayList<Alert> alerts = alertCondition.check(patient);
             // If there were alerts we go through on them and trigger the alerts
             if (!alerts.isEmpty()) {
@@ -86,8 +88,8 @@ public class AlertGenerator {
         return addToTriggeredAlertsHistory;
     }
 
-    public void addAlertCondition(AlertCondition alertCondition) {
-        this.alertConditions.add(alertCondition);
+    public void addAlertStrategy(AlertStrategy alertStrategy) {
+        this.alertStrategies.add(alertStrategy);
     }
 
     /**

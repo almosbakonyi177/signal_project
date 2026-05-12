@@ -15,11 +15,12 @@ import com.alerts.AlertGenerator;
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
     private Map<Integer, StaffMember>  staffMemberMap;
+    private static DataStorage instance;
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
-     * structure.
+     * structure. Uses singleton constructor.
      */
-    public DataStorage() {
+    private DataStorage() {
         this.patientMap = new HashMap<>();
         this.staffMemberMap = new HashMap<>();
     }
@@ -130,6 +131,19 @@ public class DataStorage {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the only existing Data Storage in the program.
+     * If no Data Storage exists, it creates one. Implements Singleton design pattern.
+     * @return The only existing Data Storage in the program if exists one,
+     * otherwise it creates one.
+     */
+    public DataStorage getDataStorage(){
+        if (this.instance==null){
+            return new DataStorage();
+        }
+        return instance;
     }
 
 
