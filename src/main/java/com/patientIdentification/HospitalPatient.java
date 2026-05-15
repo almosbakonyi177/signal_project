@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Represents the copy of a hospital patient, whose data can be retrieved and
- * to who the measurements will be linked.
+ * to whom the measurements will be linked.
  */
 public class HospitalPatient {
     private int patientId;

@@ -1,6 +1,9 @@
 package com.data_management;
 
-//Stores the crucial data of every staff member
+/**
+ * Represents a staff member in the hospital.
+ * Stores the crucial data of every staff member.
+ */
 public class StaffMember {
     private int staffId;
     private String firstName;
@@ -15,7 +18,7 @@ public class StaffMember {
     }
 
     /**
-     * Returns the role level of this staff member.
+     * Retrieves the role level of this staff member.
      * @return The role level of this staff member.
      */
     public int getRoleLevel() {
@@ -23,8 +26,8 @@ public class StaffMember {
     }
 
     /**
-     *
-     * @return
+     * Retrieves the id of this staff member.
+     * @return The id of this staff member.
      */
     public int getId() {
         return staffId;

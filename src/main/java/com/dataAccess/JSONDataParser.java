@@ -25,6 +25,9 @@ public class JSONDataParser implements DataParser {
             if (lines[i].isBlank()) {
                 continue;
             }
+
+            // Check if there is a start of a record
+            // Assume every JSON record starts with {
             if (lines[i].trim().startsWith("{")) {
                 int patientId=0;
                 double MeasurementValue =0;
@@ -63,7 +66,9 @@ public class JSONDataParser implements DataParser {
                             }
                         }
                         if (counter == 4) {
-                            if (valuePart.contains("L")){
+                            // If there was an L used in input to mark Long timestamp inputs
+                            // then get rid of L, only keep the number
+                            if (valuePart.contains("L") || valuePart.contains("l")) {
                                 valuePart = valuePart.substring(0, valuePart.length() - 1).trim();
                             }
                             timestamp = Long.parseLong(valuePart);

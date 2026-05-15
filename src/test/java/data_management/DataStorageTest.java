@@ -3,6 +3,7 @@ package data_management;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.data_management.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,12 +14,22 @@ import java.util.List;
 class DataStorageTest {
 
 
+    /**
+     * Need to clear storage before every test, otherwise if we add patient data
+     * in one test, it will ruin the others and vice versa.
+     */
+    @BeforeEach
+    void setUp() {
+        DataStorage storage = DataStorage.getInstance();
+        storage.clearStorage();
+    }
+
     //Unit tests first
     @Test
     void testAddAndGetRecords() {
         // TODO Perhaps you can implement a mock data reader to mock the test data?
         // DataReader reader
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
         storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
 
@@ -30,7 +41,7 @@ class DataStorageTest {
 
     @Test
     void testGetAllRecordsForPatient() {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
         storage.addPatientData(2, 200.0, "WhiteBloodCells", 1714376789051L);
         storage.addPatientData(2, 100.0, "SystolicPressure", 1814376789051L);
@@ -45,7 +56,7 @@ class DataStorageTest {
 
     @Test
     void testGetAllPatients() {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         storage.addPatientData(1, 100.0,
                 "WhiteBloodCells", 1714376789050L);
         storage.addPatientData(2, 10.0,
@@ -61,7 +72,7 @@ class DataStorageTest {
      */
     @Test
     void testGetNonExistingPatientRecords(){
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         // It should be an empty array list, but not null
         assertEquals(0, storage.getPatientRecords(1).size());
         assertNotNull(storage.getPatientRecords(1));
@@ -103,7 +114,7 @@ class DataStorageTest {
     @Test
     void testDataRetrieveForStaff() {
 
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         // Create a staff member
         storage.addStaffMemberData(1,"Lucas", "Man",3);
 
@@ -128,7 +139,7 @@ class DataStorageTest {
     @Test
     void testLowLevelStaffDataRequest() {
 
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         // Create a staff member
         storage.addStaffMemberData(1,"Lucas", "Man",1);
 
@@ -156,7 +167,7 @@ class DataStorageTest {
     @Test
     void testRetrieveNonExistingPatientId() {
 
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         // Create a staff member
         storage.addStaffMemberData(1,"Lucas", "Man",3);
 
@@ -172,7 +183,7 @@ class DataStorageTest {
 
     @Test
     void testdeletedStaffMemberDataRequest() {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         storage.addStaffMemberData(1,"Lucas", "Man",3);
         DataRetriever dataRetriever = new DataRetriever(storage,2);
         storage.addPatientData(1, 100.0,

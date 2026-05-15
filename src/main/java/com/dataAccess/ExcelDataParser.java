@@ -29,7 +29,7 @@ public class ExcelDataParser implements DataParser {
 
                 for (String part : parts) {
                     // If we find broken data (no value for any record value, patientId etc)
-                    // we skip that line
+                    // we skip that line, skip the whole record
                     if (part.isEmpty()) broken = true;
                 }
                 if(broken) continue;

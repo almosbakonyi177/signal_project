@@ -1,7 +1,6 @@
 package com.alerts;
 
-import com.alerts.checkers.AlertStrategy;
-import com.alerts.checkers.AlertStrategy;
+import com.alerts.alertStrategies.AlertStrategy;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 
@@ -50,7 +49,7 @@ public class AlertGenerator {
 
         // We go through on all checking methods
         for (AlertStrategy alertCondition : alertStrategies) {
-            ArrayList<Alert> alerts = alertCondition.check(patient);
+            ArrayList<Alert> alerts = alertCondition.checkAlert(patient);
             // If there were alerts we go through on them and trigger the alerts
             if (!alerts.isEmpty()) {
                 for (Alert alert : alerts) {

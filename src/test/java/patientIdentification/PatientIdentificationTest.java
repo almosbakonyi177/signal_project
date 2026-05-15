@@ -7,6 +7,7 @@ import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 import com.patientIdentification.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.crypto.Data;
@@ -19,10 +20,22 @@ import java.util.Map;
  * Responsible for testing the Patient Identification module.
  */
 public class PatientIdentificationTest {
+
+
+    /**
+     * Need to clear storage before every test, otherwise if we add patient data
+     * in one test, it will ruin the others and vice versa.
+     */
+    @BeforeEach
+    void setUp() {
+        DataStorage storage = DataStorage.getInstance();
+        storage.clearStorage();
+    }
+
     @Test
     void testValidateMatch()
     {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         HospitalPatient patient = new HospitalPatient(1, null);
 
@@ -43,7 +56,7 @@ public class PatientIdentificationTest {
     @Test
     void testValidateMatchNonExistent()
     {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
@@ -57,7 +70,7 @@ public class PatientIdentificationTest {
     @Test
     void testHandleMismatch()
     {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         HospitalPatient patient = new HospitalPatient(1, null);
         MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>(),
@@ -74,7 +87,7 @@ public class PatientIdentificationTest {
     @Test
     public void testFindHospitalPatient()
     {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         dataStorage.addPatientData(1, 0, "null", 0);
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
@@ -90,7 +103,7 @@ public class PatientIdentificationTest {
     @Test
     public void testMismatchLog()
     {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         List<String> log = new ArrayList<>();
 
@@ -105,7 +118,7 @@ public class PatientIdentificationTest {
 
     @Test
     void IncomingDataPointToNonExistingPatient() {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         IncomingDataPoint incomingDataPoint = new IncomingDataPoint(
                 1,100,"Saturation",1000L);
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
@@ -129,7 +142,7 @@ public class PatientIdentificationTest {
     @Test
     void testAddRecordToExistingHospitalPatient()
     {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         List<String> log = new ArrayList<>();
 

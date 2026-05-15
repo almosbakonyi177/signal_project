@@ -4,7 +4,7 @@ import com.alerts.Alert;
 import com.alerts.alertFactory.AlertFactory;
 import com.alerts.alertFactory.BloodPressureAlertFactory;
 import com.alerts.alertFactory.ECGAlertFactory;
-import com.alerts.checkers.AlertStrategy;
+import com.alerts.alertStrategies.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
@@ -21,7 +21,7 @@ public class ECGPeakStrategy implements AlertStrategy {
      * @return List of alerts that need to be triggered, if there was any,
       * otherwise an empty list.
      */
-    public ArrayList<Alert> check(Patient patient) {
+    public ArrayList<Alert> checkAlert(Patient patient) {
         // The timestamp limit is the time interval tolerance
         // We do not want to make an alert if there was a big increase, but after many hours
         // We only alert if there was a big change in one hour max
@@ -48,6 +48,10 @@ public class ECGPeakStrategy implements AlertStrategy {
                         ECGTimeStamps.add(record.getTimestamp());
                     } else {
                         if (checkIfPeak(calculateAverage(ECGValues), record.getMeasurementValue())) {
+
+                            // Call the alert factory without knowing which exact alert
+                            // Factory I'm calling to create the alert, I know it can create
+                            // alert because I use interface, polymorphism
                             Alert alert = alertFactory.createAlert(patient.getPatientId(),
                                     "Peak", record.getTimestamp());
                             alerts.add(alert);

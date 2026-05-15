@@ -3,20 +3,20 @@ package com.alerts.alertFactory;
 import com.alerts.Alert;
 
 /**
- * Represents an alert in blood oxygen saturation category.
+ * Represents an alert in HypotensiveHypoxemiaAlert category.
  */
-public class BloodOxygenAlert implements Alert {
+public class HypotensiveHypoxemiaAlert implements Alert{
 
     private int patientId;
     private String condition;
     private String alertType;
     private long timestamp;
 
-    public BloodOxygenAlert(int patientId, String condition, long timestamp) {
+    public HypotensiveHypoxemiaAlert(int patientId, String condition, long timestamp) {
         this.patientId = patientId;
         this.condition = condition;
         this.timestamp = timestamp;
-        this.alertType = "BloodOxygen";
+        this.alertType = "HypotensiveHypoxemia";
     }
 
     /**

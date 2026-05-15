@@ -49,9 +49,9 @@ public class HealthDataSimulator {
      */
     public HealthDataSimulator getInstance() {
         if (instance == null) {
-            return new HealthDataSimulator();
+            instance = new HealthDataSimulator();
         }
-        return this;
+        return instance;
     }
 
     public static void main(String[] args) throws IOException {

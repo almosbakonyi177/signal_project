@@ -4,8 +4,10 @@ import com.data_management.PatientRecord;
 import com.patientIdentification.IdentityManager;
 import com.patientIdentification.IncomingDataPoint;
 
-// Receives the unified/standardized data from the Data Parser
-// and integrates it into the storage.
+/**
+ * Receives the unified/standardized data from the Data Parser
+ * and integrates it into the storage.
+ */
 public class DataSourceAdapter {
     private IdentityManager identityManager;
 

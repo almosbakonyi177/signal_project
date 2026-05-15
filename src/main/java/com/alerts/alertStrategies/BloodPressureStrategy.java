@@ -3,26 +3,27 @@ package com.alerts.alertStrategies;
 import com.alerts.Alert;
 import com.alerts.alertFactory.AlertFactory;
 import com.alerts.alertFactory.BloodPressureAlertFactory;
-import com.alerts.checkers.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
 
-// Responsible for checking if the patients' blood pressure
-// data meet the requirements to trigger an alert.
+/**
+ * Responsible for evaluation of a patient's blood pressure records
+ * and generating alerts when critical values or increasing/decreasing trends are detected.
+ */
+
 public class BloodPressureStrategy implements AlertStrategy {
 
     /**
-     * Checks if the patient's blood pressure measurements are
-     * in a healthy range.
-     * @param patient The patient, for who we would like to check if
-     *                the blood pressure is in healthy range.
+     * Evaluates the given patient's blood pressure records and generates a list
+     * of alerts if there was any critical value or trends.
+     * @param patient The patient, whose blood pressure records are being evaluated.
      * @return List of alerts that need to be triggered, if there was any,
      * otherwise an empty list.
      */
     @Override
-    public ArrayList<Alert> check(Patient patient) {
+    public ArrayList<Alert> checkAlert(Patient patient) {
         ArrayList<Alert> alerts = new ArrayList<>();
         String problem ="";
         AlertFactory alertFactory = new BloodPressureAlertFactory();

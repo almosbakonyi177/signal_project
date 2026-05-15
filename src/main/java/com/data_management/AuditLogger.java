@@ -3,9 +3,11 @@ package com.data_management;
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
-// Notes and stores all the requests for patient data.
-// Stores the staff member who requested the patient data, the patient Id,
-// whose data was requested and if the access was given to the data.
+/**
+ * Notes and stores all the requests for patient data.
+ * Stores the staff member who requested the patient data, the patient Id,
+ * whose data was requested and if the access was given to the data.
+ */
 public class AuditLogger {
     private ArrayList<DataRequest> requests;
 
@@ -13,6 +15,11 @@ public class AuditLogger {
         this.requests = new ArrayList<>();
     }
 
+    /**
+     * Retrieves the list of requests for patient data.
+     * @return The list of requests for patient data, if there was no request,
+     * it returns an empty list.
+     */
     public ArrayList<DataRequest> getRequests() {
         return requests;
     }

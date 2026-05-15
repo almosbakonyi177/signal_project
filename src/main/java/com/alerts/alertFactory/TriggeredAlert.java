@@ -2,31 +2,29 @@ package com.alerts.alertFactory;
 
 import com.alerts.Alert;
 
-/**
- * Represents an alert in blood oxygen saturation category.
- */
-public class BloodOxygenAlert implements Alert {
-
+public class TriggeredAlert implements Alert {
     private int patientId;
     private String condition;
     private String alertType;
     private long timestamp;
 
-    public BloodOxygenAlert(int patientId, String condition, long timestamp) {
+    public TriggeredAlert(int patientId, String condition, long timestamp) {
         this.patientId = patientId;
         this.condition = condition;
         this.timestamp = timestamp;
-        this.alertType = "BloodOxygen";
+        this.alertType = "TriggeredAlert";
     }
 
     /**
      * Retrieves the patient Id to who we link this alert.
      * @return patient Id to who we link this alert.
      */
+    @Override
     public int getPatientId() {
         return patientId;
     }
 
+    @Override
     public String getCondition() {
         return condition;
     }

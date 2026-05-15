@@ -3,15 +3,18 @@ package com.alerts;
 import com.cardio_generator.outputs.ConsoleOutputStrategy;
 import com.cardio_generator.outputs.TcpOutputStrategy;
 
-//Dispatches alerts to the staff and uploads them to tcp server for easy tracking
+/**
+ * Manages alert delivery by notifying the staff members and uploading
+ * the alerts to the chosen Tcp server.
+ */
 public class AlertManager {
     private TcpOutputStrategy server = new TcpOutputStrategy(1);
     private ConsoleOutputStrategy console = new ConsoleOutputStrategy();
 
 
     /**
-     * Notifies the staff for an alert by writing it on console.
-     * @param alert 
+     * Notifies the staff about the given alert through writing it on console.
+     * @param alert the alert that needs to be printed on console.
      */
     public void notifyStaff(Alert alert) {
         console.output(alert.getPatientId(),alert.getTimestamp(),
@@ -20,7 +23,7 @@ public class AlertManager {
 
     /**
      * Uploads the given alert to a tcp server.
-     * @param alert
+     * @param alert The alert to be uploaded.
      */
     public void uploadAlert(Alert alert) {
         server.output(alert.getPatientId(),alert.getTimestamp(),

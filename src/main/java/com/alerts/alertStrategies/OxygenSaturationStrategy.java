@@ -4,7 +4,7 @@ import com.alerts.Alert;
 import com.alerts.alertFactory.AlertFactory;
 import com.alerts.alertFactory.BloodOxygenAlertFactory;
 import com.alerts.alertFactory.ECGAlertFactory;
-import com.alerts.checkers.AlertStrategy;
+import com.alerts.alertStrategies.AlertStrategy;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
@@ -18,12 +18,14 @@ import java.util.ArrayList;
 public class OxygenSaturationStrategy implements AlertStrategy {
 
     /**
-     * Checks
-     * @param patient
-     * @return List of alerts, if there was any, otherwise an empty list.
+     * Evaluates the given patient's blood saturation records and generates a list
+     * of alerts if there was any critical value or trends.
+     * @param patient The patient, whose blood saturation records are being evaluated.
+     * @return List of alerts that need to be triggered, if there was any,
+     * otherwise an empty list.
      */
     @Override
-    public ArrayList<Alert> check(Patient patient) {
+    public ArrayList<Alert> checkAlert(Patient patient) {
         ArrayList<Alert> alerts = new ArrayList<>();
         String problem ="";
         long lastTimeStamp =0;

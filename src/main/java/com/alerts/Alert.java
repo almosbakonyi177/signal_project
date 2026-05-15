@@ -1,47 +1,32 @@
 package com.alerts;
 
 /**
- * Represents an alert, which shows the type and condition of a problem(High blood pressure etc),
- * links these data to the patient and time when it occurred.
+ * Represents an alert, which is associated to a patient.
+ * Contains patientId, a detected condition, an alert type and
+ * a timestamp when the alert was triggered.
  */
-public abstract class Alert {
-    private int patientId;
-    private String condition;
-    private String alertType;
-    private long timestamp;
-
-    public Alert(int patientId, String condition, long timestamp, String alertType) {
-        this.patientId = patientId;
-        this.condition = condition;
-        this.timestamp = timestamp;
-        this.alertType = alertType;
-    }
-
+public interface Alert {
     /**
      * Retrieves the patient Id to who we link this alert.
      * @return patient Id to who we link this alert.
      */
-    public int getPatientId() {
-        return patientId;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
+    int getPatientId();
 
     /**
-     * Retrieves the type of this alert.
+     * Retrieves the type of this alert, for example BloodPressure.
      * @return The type of this alert.
      */
-    public String getType() {
-        return alertType;
-    }
+    String getCondition();
 
     /**
      * Retrieves the time when the problem occurred.
      * @return The time when the problem occurred
      */
-    public long getTimestamp() {
-        return timestamp;
-    }
+    String getType();
+
+    /**
+     * Retrieves the time in milliseconds when the alert was triggered.
+     * @return Timestamp of this alert.
+     */
+    long getTimestamp();
 }

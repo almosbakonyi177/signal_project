@@ -148,7 +148,7 @@ public class DataAccessTest {
     void WebsocketDataListenerTest() {
         JSONDataParser parser = new JSONDataParser();
         Map<Integer, HospitalPatient> patients = new HashMap<>();
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         IdentityManager identityManager =
                 new IdentityManager(patients, dataStorage,
                         new MismatchHandler(null,0));

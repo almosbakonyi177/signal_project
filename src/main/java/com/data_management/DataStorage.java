@@ -119,7 +119,7 @@ public class DataStorage {
     }
 
     /**
-     * Retrieves the patient by given patient Id, if exists.
+     * Retrieves the patient object by given patient Id, if the patient exists.
      * @param patientId The Id of patient, who we search for.
      * @return The patient with the searched Id if the patient exists in the data storage,
      * otherwise null.
@@ -139,11 +139,16 @@ public class DataStorage {
      * @return The only existing Data Storage in the program if exists one,
      * otherwise it creates one.
      */
-    public DataStorage getDataStorage(){
-        if (this.instance==null){
-            return new DataStorage();
+    public static DataStorage getInstance() {
+        if (instance==null){
+            instance = new DataStorage();
         }
         return instance;
+    }
+
+    public void clearStorage() {
+        this.patientMap.clear();
+        this.staffMemberMap.clear();
     }
 
 
@@ -157,7 +162,7 @@ public class DataStorage {
     public static void main(String[] args) {
         // DataReader is not defined in this scope, should be initialized appropriately.
         // DataReader reader = new SomeDataReaderImplementation("path/to/data");
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
 
         // Assuming the reader has been properly initialized and can read data into the
         // storage

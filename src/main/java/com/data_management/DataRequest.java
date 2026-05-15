@@ -1,6 +1,10 @@
 package com.data_management;
 
-// Represents one patient data query request
+/**
+ * Represents one patient data query request.
+ * Stores the patient id, the staff id who made the request,
+ * and if the access was given or not.
+ */
 public class DataRequest {
     private int patientId;
     private int staffId;

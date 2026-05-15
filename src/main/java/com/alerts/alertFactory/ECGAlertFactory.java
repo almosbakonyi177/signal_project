@@ -2,7 +2,13 @@ package com.alerts.alertFactory;
 
 import com.alerts.Alert;
 
-public class ECGAlertFactory extends AlertFactory {
+/**
+ * Represents a factory that creates ECG alerts.
+ * Instantiates {@link ECGAlert} objects based on given
+ * patient id, condition and timestamp.
+ */
+public class ECGAlertFactory implements AlertFactory {
+    @Override
     public Alert createAlert(int patientId, String condition, long timestamp) {
         return new ECGAlert(patientId, condition, timestamp);
     }
