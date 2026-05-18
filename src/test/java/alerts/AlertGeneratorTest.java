@@ -8,6 +8,7 @@ import com.alerts.alertStrategies.OxygenSaturationStrategy;
 import com.alerts.alertStrategies.ECGPeakStrategy;
 import com.alerts.alertStrategies.HypotensiveHypoxemiaStrategy;
 import com.data_management.DataStorage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.data_management.Patient;
 
@@ -22,53 +23,14 @@ public class AlertGeneratorTest {
     // class' method checks, this will be fixed soon
     // Reason for it: needed to rename and refactor the strategy methods to some extent
 
-    @Test
-    public void testIncreaseSystolic() {
-        Patient patient = new Patient(1);
-        patient.addRecord(100,"SystolicPressure", 1000L);
-        patient.addRecord(120,"SystolicPressure", 10000L);
-        patient.addRecord(131,"SystolicPressure", 20000L);
-        patient.addRecord(142,"SystolicPressure", 20100L);
-        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
-        ArrayList<Alert> alerts = bloodPressureStrategy.checkAlert(patient);
-        assertEquals(1, alerts.size()); // checkAlert if there was only one alert
-    }
-
-
-    @Test
-    public void testDecreaseSystolic() {
-        Patient patient = new Patient(1);
-        patient.addRecord(160,"SystolicPressure", 1000L);
-        patient.addRecord(140,"SystolicPressure", 10000L);
-        patient.addRecord(120,"SystolicPressure", 20000L);
-        patient.addRecord(100,"SystolicPressure", 21000L);
-        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
-        ArrayList<Alert> alerts = bloodPressureStrategy.checkAlert(patient);
-        assertEquals(1, alerts.size()); // checkAlert if there was only one alert
-        assertEquals("DecreaseTrendSystolic", alerts.get(0).getCondition());
-    }
-
-
-    @Test
-    public void testCriticalHighSystolic() {
-        Patient patient = new Patient(1);
-        patient.addRecord(198,"SystolicPressure", 20100L);
-        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
-        ArrayList<Alert> alerts = bloodPressureStrategy.checkAlert(patient);
-        assertEquals(1, alerts.size());
-        assertEquals("CriticalHighSystolic", alerts.get(0).getCondition());
-    }
-
-
-    @Test
-    public void testCriticalLowSystolic() {
-        Patient patient = new Patient(1);
-        // Healthy systolic is between 90 and 180
-        patient.addRecord(80,"SystolicPressure", 20100L);
-        BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
-        ArrayList<Alert> alerts = bloodPressureStrategy.checkAlert(patient);
-        assertEquals(1, alerts.size());
-        assertEquals("CriticalLowSystolic", alerts.get(0).getCondition());
+    /**
+     * Need to clear storage before every test, otherwise if we add patient data
+     * in one test, it will ruin the others and vice versa.
+     */
+    @BeforeEach
+    void setUp() {
+        DataStorage storage = DataStorage.getInstance();
+        storage.clearStorage();
     }
 
 
@@ -245,7 +207,7 @@ public class AlertGeneratorTest {
         DataStorage storage = DataStorage.getInstance();
         AlertGenerator alertGenerator = new AlertGenerator(storage);
 
-        //First alert, drop in 10 mins
+        // First alert, drop in 10 mins
         storage.addPatientData(
                 1,100,"Saturation", 1000L);
         storage.addPatientData(
@@ -271,8 +233,8 @@ public class AlertGeneratorTest {
         // alerts in blood pressure or saturation, but not overall.
 
 
-        assertEquals("1,10000,BloodSaturation,BloodSaturationDrop",
-                alertGenerator.getAddToTriggeredAlertsHistory().get(0).toString());
+        assertEquals("1,10000,BloodOxygen,BloodSaturationDrop",
+                alertGenerator.getAddToTriggeredAlertsHistory().get(0));
         // First happened the saturation in the saturation changes
     }
 

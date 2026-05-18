@@ -9,6 +9,7 @@ import com.patientIdentification.HospitalPatient;
 import com.patientIdentification.IdentityManager;
 import com.patientIdentification.IncomingDataPoint;
 import com.patientIdentification.MismatchHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 public class DataAccessTest {
+
+    /**
+     * Need to clear storage before every test, otherwise if we add patient data
+     * in one test, it will ruin the others and vice versa.
+     */
+    @BeforeEach
+    void setUp() {
+        DataStorage storage = DataStorage.getInstance();
+        storage.clearStorage();
+    }
 
     @Test
     void excelParserTestWithHeader() {

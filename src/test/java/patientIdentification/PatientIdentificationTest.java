@@ -144,7 +144,6 @@ public class PatientIdentificationTest {
     {
         DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
-        List<String> log = new ArrayList<>();
 
         // We add a patient data to the core storing unit, it's like an inner server
         dataStorage.addPatientData(1, 0, "null", 0);
@@ -153,10 +152,9 @@ public class PatientIdentificationTest {
         IncomingDataPoint data = new IncomingDataPoint(1,0,
                 "Saturation", 1000);
 
-        MismatchHandler mismatchHandler = new MismatchHandler(log, 2000L);
 
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler);
+                null);
 
         // We retrieve the data from the inner server, and store it in the outer server
         // for short term use
@@ -176,6 +174,49 @@ public class PatientIdentificationTest {
         // One from the core server, and one from the outside, which was
         // integrated into the core server
         assertEquals(2, identityManager.retrieveHospitalPatient(
+                1).getPatientRecords().size());
+    }
+
+
+    /**
+     * Edge case: What happens when we try to add an already existing record to a patient
+     * We should not have duplicates.
+     * Duplicate means: 2 records have the same type, measurement value, timestamp,(and
+     * obviously they are linked to the same patient)
+     */
+    @Test
+    void addExistingRecord(){
+        DataStorage dataStorage = DataStorage.getInstance();
+        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
+
+        // We add a patient data to the core storing unit, it's like an inner server
+        dataStorage.addPatientData(1, 100, "Saturation", 1000L);
+
+        // An incoming record
+        IncomingDataPoint data = new IncomingDataPoint(1,100,
+                "Saturation", 1000L);
+
+        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
+                null);
+
+        // We retrieve the data from the inner server, and store it in the outer server
+        // for short term use
+        identityManager.copyHospitalPatients();
+
+        DataSourceAdapter dataSourceAdapter = new DataSourceAdapter(identityManager);
+
+        // We will try to integrate the data to the main server.
+        dataSourceAdapter.integrateData(data);
+
+        // If we don't copy we cannot retrieve it
+        // We cannot directly retrieve patient data from inner server
+        // We copy the data from inner server and store it for short term use(as deep copy)
+        identityManager.copyHospitalPatients();
+
+        // There should be 2 records in the patient records:
+        // One from the core server, and one from the outside, which was
+        // integrated into the core server
+        assertEquals(1, identityManager.retrieveHospitalPatient(
                 1).getPatientRecords().size());
     }
 }
