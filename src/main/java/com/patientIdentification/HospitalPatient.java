@@ -1,7 +1,6 @@
 package com.patientIdentification;
 
 import com.data_management.PatientRecord;
-import java.util.HashMap;
 import java.util.List;
 
 /**

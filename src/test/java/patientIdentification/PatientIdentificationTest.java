@@ -41,8 +41,9 @@ public class PatientIdentificationTest {
 
 
         hospital_patients.put(1, patient);
+        PatientIdentifier identifier=new PatientIdentifier(hospital_patients);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null);
+                null, identifier);
 
 
         assertTrue(identityManager.validateMatch(1));
@@ -59,8 +60,9 @@ public class PatientIdentificationTest {
         DataStorage dataStorage = DataStorage.getInstance();
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                new MismatchHandler(null, 0));
+                new MismatchHandler(null, 0), identifier);
 
 
         assertFalse(identityManager.validateMatch(1));
@@ -76,9 +78,10 @@ public class PatientIdentificationTest {
         MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>(),
                 0);
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
         hospital_patients.put(1, patient);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler);
+                mismatchHandler, identifier);
 
         assertFalse(identityManager.validateMatch(3));
     }
@@ -91,8 +94,9 @@ public class PatientIdentificationTest {
         dataStorage.addPatientData(1, 0, "null", 0);
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null);
+                null,identifier);
 
         identityManager.copyHospitalPatients();
         HospitalPatient patient = identityManager.retrieveHospitalPatient(1);
@@ -107,9 +111,10 @@ public class PatientIdentificationTest {
         Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         List<String> log = new ArrayList<>();
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
         MismatchHandler mismatchHandler = new MismatchHandler(log, 10000L);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler);
+                mismatchHandler, identifier);
         identityManager.validateMatch(2);
 
         //There should be one documented mismatch on the mismatch log
@@ -126,17 +131,21 @@ public class PatientIdentificationTest {
         MismatchHandler mismatchHandler = new MismatchHandler(
                 new ArrayList<String>(),0);
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
+
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler);
+                mismatchHandler, identifier);
 
         DataSourceAdapter adapter = new DataSourceAdapter(identityManager);
 
         // We try to integrate the incoming data point to our inner server
-        // It will try to validate a match->won't happen->mismatch->mismatch handler documents it
+        // If the patient does not exist in the server yet, we document the mismatch first,
+        // Then add the patient to the inner server.
         adapter.integrateData(incomingDataPoint);
 
         // Check if we got one mismatch and it was handled correctly by the mismatch handler
         assertEquals("1,0", mismatchHandler.getMismatchLog().get(0));
+        assertEquals(1, dataStorage.getPatientById(1).getAllRecords().size());
     }
 
     @Test
@@ -153,8 +162,9 @@ public class PatientIdentificationTest {
                 "Saturation", 1000);
 
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null);
+                null, identifier);
 
         // We retrieve the data from the inner server, and store it in the outer server
         // for short term use
@@ -196,8 +206,10 @@ public class PatientIdentificationTest {
         IncomingDataPoint data = new IncomingDataPoint(1,100,
                 "Saturation", 1000L);
 
+        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
+
         IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null);
+                null, identifier);
 
         // We retrieve the data from the inner server, and store it in the outer server
         // for short term use

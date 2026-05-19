@@ -1,0 +1,24 @@
+{
+	patientId:1,
+	measurementValue:100,
+	recordType:"Saturation",
+	timestamp:1000L
+}
+{
+	patientId:1,
+	measurementValue:94,
+	recordType:"Saturation",
+	timestamp:10000L
+}
+{
+	patientId:2,
+	measurementValue:10,
+	recordType:"DiastolicPressure",
+	timestamp:15000L
+}
+{
+	patientId:3,
+	measurementValue:94,
+	recordType:"Saturation",
+	timestamp:10000L
+}

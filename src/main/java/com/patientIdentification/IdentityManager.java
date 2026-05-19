@@ -5,7 +5,6 @@ import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +21,11 @@ public class IdentityManager {
 
     public IdentityManager(Map<Integer, HospitalPatient> hospitalPatientMap,
                            DataStorage dataStorage,
-                           MismatchHandler mismatchHandler) {
+                           MismatchHandler mismatchHandler,
+                           PatientIdentifier identifier) {
 
         this.hospitalPatientMap = hospitalPatientMap;
-        this.patientIdentifier = new PatientIdentifier(hospitalPatientMap);
+        this.patientIdentifier = identifier;
 
         this.dataStorage = dataStorage;
         this.mismatchHandler = mismatchHandler;
@@ -101,8 +101,9 @@ public class IdentityManager {
      */
     public void addRecord(int patientId, PatientRecord patientRecord) {
         if (!validateMatch(patientId)) {
-            // If there was no patient with this id, we document it
-            return;
+            // If there was no patient with this id, we document it and add that patient to the system
+            dataStorage.addPatientData(patientId, patientRecord.getMeasurementValue(),
+                    patientRecord.getRecordType(), patientRecord.getTimestamp());
         }
 
         // We add the incoming record to the original patient records.

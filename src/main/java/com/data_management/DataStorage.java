@@ -1,10 +1,20 @@
 package com.data_management;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.alerts.AlertGenerator;
+import com.alerts.alertStrategies.*;
+import com.dataAccess.DataParser;
+import com.dataAccess.DataSourceAdapter;
+import com.dataAccess.JSONDataParser;
+import com.patientIdentification.HospitalPatient;
+import com.patientIdentification.IdentityManager;
+import com.patientIdentification.MismatchHandler;
+import com.patientIdentification.PatientIdentifier;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -159,17 +169,31 @@ public class DataStorage {
      * 
      * @param args command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // DataReader is not defined in this scope, should be initialized appropriately.
-        // DataReader reader = new SomeDataReaderImplementation("path/to/data");
         DataStorage storage = DataStorage.getInstance();
+        DataParser parser = new JSONDataParser();
+
+
+        Map hospitalPatientMap = new HashMap<Integer, HospitalPatient>();
+        MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>(), 0);
+        IdentityManager identityManager = new IdentityManager(hospitalPatientMap,
+                storage, mismatchHandler, new PatientIdentifier(hospitalPatientMap));
+
+        DataSourceAdapter adapter=new DataSourceAdapter(identityManager);
+
+        // Use injection for interface Data parser and data source adapter, polymorphism
+        // We could use any data parser, requires one small change
+        DataReader reader = new SimulationDataReader(adapter, parser);
 
         // Assuming the reader has been properly initialized and can read data into the
         // storage
-        // reader.readData(storage);
+        String filePath=System.getProperty("user.dir")+"\\src";
+        System.out.println("Loading data from "+filePath);
+        reader.readData(new File(filePath+"\\SimulationOutput.txt"));
 
         // Example of using DataStorage to retrieve and print records for a patient
-        List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
+        List<PatientRecord> records = storage.getRecords(1, 0, 1800000000000L);
         for (PatientRecord record : records) {
             System.out.println("Record for Patient ID: " + record.getPatientId() +
                     ", Type: " + record.getRecordType() +
@@ -179,8 +203,17 @@ public class DataStorage {
 
         // Initialize the AlertGenerator with the storage
         AlertGenerator alertGenerator = new AlertGenerator(storage);
+        // System.out.println(storage.getPatientById(2).getAllRecords().size());
 
         // Evaluate all patients' data to check for conditions that may trigger alerts
+
+        // Add the Strategies in runtime
+        alertGenerator.addAlertStrategy(new BloodPressureStrategy());
+        alertGenerator.addAlertStrategy(new OxygenSaturationStrategy());
+        alertGenerator.addAlertStrategy(new ECGPeakStrategy());
+        alertGenerator.addAlertStrategy(new HypotensiveHypoxemiaStrategy());
+        alertGenerator.addAlertStrategy(new TriggeredAlertStrategy());
+
         for (Patient patient : storage.getAllPatients()) {
             alertGenerator.evaluateData(patient);
         }

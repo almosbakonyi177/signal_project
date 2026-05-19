@@ -5,10 +5,7 @@ import com.dataAccess.ExcelDataParser;
 import com.dataAccess.JSONDataParser;
 import com.dataAccess.WebSocketDataListener;
 import com.data_management.DataStorage;
-import com.patientIdentification.HospitalPatient;
-import com.patientIdentification.IdentityManager;
-import com.patientIdentification.IncomingDataPoint;
-import com.patientIdentification.MismatchHandler;
+import com.patientIdentification.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -160,9 +157,10 @@ public class DataAccessTest {
         JSONDataParser parser = new JSONDataParser();
         Map<Integer, HospitalPatient> patients = new HashMap<>();
         DataStorage dataStorage = DataStorage.getInstance();
+        PatientIdentifier identifier = new PatientIdentifier(patients);
         IdentityManager identityManager =
                 new IdentityManager(patients, dataStorage,
-                        new MismatchHandler(null,0));
+                        new MismatchHandler(null,0),identifier);
 
 
         // Need to add at least one record, in order to have the patient in the server
