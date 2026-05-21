@@ -1,6 +1,8 @@
 package com.alerts;
 
 import com.alerts.alertStrategies.AlertStrategy;
+import com.alerts.decorators.AlertDecorator;
+import com.alerts.decorators.RepeatedAlertDecorator;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 
@@ -20,7 +22,9 @@ public class AlertGenerator {
     // without a lot of work on the existing code
     private List<AlertStrategy> alertStrategies = new ArrayList<AlertStrategy>();
 
-    private List<String> addToTriggeredAlertsHistory = new ArrayList<>();
+    private List<String> triggeredAlertsHistory = new ArrayList<>();
+    private List<Alert> alertHistory = new ArrayList<>();
+    private AlertDecorator  alertDecorator;
 
 
     /**
@@ -53,8 +57,14 @@ public class AlertGenerator {
             // If there were alerts we go through on them and trigger the alerts
             if (!alerts.isEmpty()) {
                 for (Alert alert : alerts) {
+                    if(checkIfSimilarInHistory(alert)) {
+                        alert=new RepeatedAlertDecorator(alert, alert.getTimestamp());
+                    }
+                    else{
+                        addToTriggeredAlertsHistory(alert);
+                        alertHistory.add(alert);
+                    }
                     triggerAlert(alert);
-                    addToTriggeredAlertsHistory(alert);
                 }
             }
         }
@@ -75,16 +85,35 @@ public class AlertGenerator {
     }
 
     /**
+     * Checks if there is a similar alert(similar condition and type)
+     * in history like the given alert.
+     * @param alert The alert for which want to check if there is a
+     *              similar one already triggered in the past.
+     * @return True, if there was a similar to given alert triggered in the past, otherwise false.
+     */
+    public boolean checkIfSimilarInHistory(Alert alert) {
+        for(Alert alert1 : alertHistory){
+            if(alert1.getPatientId()==alert.getPatientId()
+            &&alert1.getType().equals(alert.getType())&&
+                    alert1.getCondition().equals(alert.getCondition())) {
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds the alert to the triggered alerts history in String format.
      * @param alert The alert we want to add to the history.
      */
     public void addToTriggeredAlertsHistory(Alert alert) {
-        addToTriggeredAlertsHistory.add(alert.getPatientId()+","+
+        triggeredAlertsHistory.add(alert.getPatientId()+","+
                 alert.getTimestamp()+","+alert.getType()+","+alert.getCondition());
     }
 
-    public List<String> getAddToTriggeredAlertsHistory() {
-        return addToTriggeredAlertsHistory;
+    public List<String> getTriggeredAlertsHistory() {
+        return triggeredAlertsHistory;
     }
 
     public void addAlertStrategy(AlertStrategy alertStrategy) {

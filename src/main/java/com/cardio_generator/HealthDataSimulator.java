@@ -47,7 +47,7 @@ public class HealthDataSimulator {
      * @return The only existing HealthDataSimulator in the program if exists one,
      * otherwise it creates one.
      */
-    public HealthDataSimulator getInstance() {
+    public static HealthDataSimulator getInstance() {
         if (instance == null) {
             instance = new HealthDataSimulator();
         }

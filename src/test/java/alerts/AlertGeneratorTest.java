@@ -234,7 +234,7 @@ public class AlertGeneratorTest {
 
 
         assertEquals("1,10000,BloodOxygen,BloodSaturationDrop",
-                alertGenerator.getAddToTriggeredAlertsHistory().get(0));
+                alertGenerator.getTriggeredAlertsHistory().get(0));
         // First happened the saturation in the saturation changes
     }
 
@@ -265,9 +265,9 @@ public class AlertGeneratorTest {
         alertGenerator.evaluateData(storage.getPatientById(1));
 
         assertEquals("1,10000,HypotensiveHypoxemia,danger",
-                alertGenerator.getAddToTriggeredAlertsHistory().get(0));
+                alertGenerator.getTriggeredAlertsHistory().get(0));
 
         assertEquals("1,24000,ECG,Peak",
-                alertGenerator.getAddToTriggeredAlertsHistory().get(1));
+                alertGenerator.getTriggeredAlertsHistory().get(1));
     }
 }

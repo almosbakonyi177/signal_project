@@ -17,6 +17,12 @@
 	timestamp:15000L
 }
 {
+	patientId:2,
+	measurementValue:40,
+	recordType:"DiastolicPressure",
+	timestamp:15000L
+}
+{
 	patientId:3,
 	measurementValue:94,
 	recordType:"Saturation",
