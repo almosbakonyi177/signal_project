@@ -36,14 +36,9 @@ public class PatientIdentificationTest {
     void testValidateMatch()
     {
         DataStorage dataStorage = DataStorage.getInstance();
-        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
-        HospitalPatient patient = new HospitalPatient(1, null);
+        dataStorage.addPatientData(1, 100,"ECG",1000L);
 
-
-        hospital_patients.put(1, patient);
-        PatientIdentifier identifier=new PatientIdentifier(hospital_patients);
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null, identifier);
+        IdentityManager identityManager = new IdentityManager(dataStorage, null);
 
 
         assertTrue(identityManager.validateMatch(1));
@@ -58,11 +53,9 @@ public class PatientIdentificationTest {
     void testValidateMatchNonExistent()
     {
         DataStorage dataStorage = DataStorage.getInstance();
-        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                new MismatchHandler(null, 0), identifier);
+        IdentityManager identityManager = new IdentityManager(dataStorage,
+                new MismatchHandler(null));
 
 
         assertFalse(identityManager.validateMatch(1));
@@ -73,15 +66,10 @@ public class PatientIdentificationTest {
     void testHandleMismatch()
     {
         DataStorage dataStorage = DataStorage.getInstance();
-        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
-        HospitalPatient patient = new HospitalPatient(1, null);
-        MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>(),
-                0);
-
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
-        hospital_patients.put(1, patient);
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler, identifier);
+        MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>());
+        dataStorage.addPatientData(1, 100,"ECG",1000L);
+        IdentityManager identityManager = new IdentityManager(dataStorage,
+                mismatchHandler);
 
         assertFalse(identityManager.validateMatch(3));
     }
@@ -92,13 +80,9 @@ public class PatientIdentificationTest {
     {
         DataStorage dataStorage = DataStorage.getInstance();
         dataStorage.addPatientData(1, 0, "null", 0);
-        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
 
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null,identifier);
+        IdentityManager identityManager = new IdentityManager(dataStorage, null);
 
-        identityManager.copyHospitalPatients();
         HospitalPatient patient = identityManager.retrieveHospitalPatient(1);
         assertNotNull(patient);
     }
@@ -108,33 +92,32 @@ public class PatientIdentificationTest {
     public void testMismatchLog()
     {
         DataStorage dataStorage = DataStorage.getInstance();
-        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
         List<String> log = new ArrayList<>();
 
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
-        MismatchHandler mismatchHandler = new MismatchHandler(log, 10000L);
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler, identifier);
+        MismatchHandler mismatchHandler = new MismatchHandler(log);
+        IdentityManager identityManager = new IdentityManager(dataStorage,
+                mismatchHandler);
+
         identityManager.validateMatch(2);
 
-        //There should be one documented mismatch on the mismatch log
+        // There should be one documented mismatch on the mismatch log
         assertEquals(1, mismatchHandler.getMismatchLog().size());
     }
+
 
     @Test
     void IncomingDataPointToNonExistingPatient() {
         DataStorage dataStorage = DataStorage.getInstance();
         IncomingDataPoint incomingDataPoint = new IncomingDataPoint(
                 1,100,"Saturation",1000L);
-        Map<Integer, HospitalPatient> hospital_patients = new HashMap<>();
+
 
         MismatchHandler mismatchHandler = new MismatchHandler(
-                new ArrayList<String>(),0);
+                new ArrayList<String>());
 
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
 
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                mismatchHandler, identifier);
+        IdentityManager identityManager = new IdentityManager(dataStorage,
+                mismatchHandler);
 
         DataSourceAdapter adapter = new DataSourceAdapter(identityManager);
 
@@ -144,7 +127,7 @@ public class PatientIdentificationTest {
         adapter.integrateData(incomingDataPoint);
 
         // Check if we got one mismatch and it was handled correctly by the mismatch handler
-        assertEquals("1,0", mismatchHandler.getMismatchLog().get(0));
+        assertEquals(1,mismatchHandler.getMismatchLog().size());
         assertEquals(1, dataStorage.getPatientById(1).getAllRecords().size());
     }
 
@@ -162,23 +145,12 @@ public class PatientIdentificationTest {
                 "Saturation", 1000);
 
 
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null, identifier);
-
-        // We retrieve the data from the inner server, and store it in the outer server
-        // for short term use
-        identityManager.copyHospitalPatients();
+        IdentityManager identityManager = new IdentityManager(dataStorage, null);
 
         DataSourceAdapter dataSourceAdapter = new DataSourceAdapter(identityManager);
 
         // We will try to integrate the data to the main server.
         dataSourceAdapter.integrateData(data);
-
-        // If we don't copy we cannot retrieve it
-        // We cannot directly retrieve patient data from inner server
-        // We copy the data from inner server and store it for short term use(as deep copy)
-        identityManager.copyHospitalPatients();
 
         // There should be 2 records in the patient records:
         // One from the core server, and one from the outside, which was
@@ -206,28 +178,17 @@ public class PatientIdentificationTest {
         IncomingDataPoint data = new IncomingDataPoint(1,100,
                 "Saturation", 1000L);
 
-        PatientIdentifier identifier = new PatientIdentifier(hospital_patients);
+        IdentityManager identityManager = new IdentityManager(dataStorage, null);
 
-        IdentityManager identityManager = new IdentityManager(hospital_patients, dataStorage,
-                null, identifier);
-
-        // We retrieve the data from the inner server, and store it in the outer server
-        // for short term use
-        identityManager.copyHospitalPatients();
 
         DataSourceAdapter dataSourceAdapter = new DataSourceAdapter(identityManager);
 
         // We will try to integrate the data to the main server.
         dataSourceAdapter.integrateData(data);
 
-        // If we don't copy we cannot retrieve it
-        // We cannot directly retrieve patient data from inner server
-        // We copy the data from inner server and store it for short term use(as deep copy)
-        identityManager.copyHospitalPatients();
 
-        // There should be 2 records in the patient records:
-        // One from the core server, and one from the outside, which was
-        // integrated into the core server
+        // There should be 1 record in the patient records, because the second that we tried to add
+        // is a duplicate
         assertEquals(1, identityManager.retrieveHospitalPatient(
                 1).getPatientRecords().size());
     }

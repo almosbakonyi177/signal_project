@@ -1,5 +1,4 @@
-package com.dataAccess;
-
+package com.dataAccess.dataListeners;
 
 public interface DataListener {
     void startListening();

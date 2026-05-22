@@ -1,5 +1,7 @@
-package com.dataAccess;
+package com.dataAccess.dataListeners;
 
+import com.dataAccess.DataSourceAdapter;
+import com.dataAccess.dataParsing.ExcelDataParser;
 import com.patientIdentification.IncomingDataPoint;
 
 import java.io.BufferedReader;
@@ -7,14 +9,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 /**
  * Responsible for listening for CSV file data, and ,while
  * the listening is active, looking for updates in the given file.
  */
-public class FileDataListener implements  DataListener {
+public class FileDataListener implements DataListener {
     private String filePath;
     private boolean activeListening = false;
     private ExcelDataParser excelDataParser = new ExcelDataParser();

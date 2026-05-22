@@ -5,8 +5,9 @@ import com.patientIdentification.IdentityManager;
 import com.patientIdentification.IncomingDataPoint;
 
 /**
+ * Acts as a bridge between data parsing and storage.
  * Receives the unified/standardized data from the Data Parser
- * and integrates it into the storage.
+ * and integrates it into the storage through identityManager.
  */
 public class DataSourceAdapter {
     private IdentityManager identityManager;

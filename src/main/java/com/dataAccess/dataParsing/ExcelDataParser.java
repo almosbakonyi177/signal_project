@@ -1,6 +1,7 @@
-package com.dataAccess;
+package com.dataAccess.dataParsing;
 
 import java.util.ArrayList;
+
 import com.patientIdentification.IncomingDataPoint;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class ExcelDataParser implements DataParser {
     /**
      * Parses the raw text from a CSV file.
      * @param rawData Raw text from a CSV file.
-     * @return A list of IncomingDataPoint objects, in which the
+     * @return A list of {@link IncomingDataPoint} objects, in which the
      * raw data are standardized.
      */
     @Override

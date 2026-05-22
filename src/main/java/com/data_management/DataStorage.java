@@ -2,15 +2,24 @@ package com.data_management;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.alerts.Alert;
 import com.alerts.AlertGenerator;
 import com.alerts.alertStrategies.*;
-import com.dataAccess.DataParser;
-import com.dataAccess.DataSourceAdapter;
-import com.dataAccess.JSONDataParser;
+import com.dataAccess.*;
+import com.dataAccess.dataParsing.DataParser;
+import com.dataAccess.dataParsing.JSONDataParser;
+import com.dataAccess.dataReading.DataReader;
+import com.dataAccess.dataReading.FileDataReader;
+import com.dataAccess.dataReading.SimulationDataReader;
+import com.dataAccess.dataReading.WebsocketClient;
 import com.patientIdentification.HospitalPatient;
 import com.patientIdentification.IdentityManager;
 import com.patientIdentification.MismatchHandler;
@@ -23,16 +32,18 @@ import com.patientIdentification.PatientIdentifier;
  * patient IDs.
  */
 public class DataStorage {
-    private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
-    private Map<Integer, StaffMember>  staffMemberMap;
+    // Stores patient objects indexed by their unique patient ID.
+    private ConcurrentHashMap<Integer, Patient> patientMap;
+
+    private ConcurrentHashMap<Integer, StaffMember>  staffMemberMap;
     private static DataStorage instance;
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure. Uses singleton constructor.
      */
     private DataStorage() {
-        this.patientMap = new HashMap<>();
-        this.staffMemberMap = new HashMap<>();
+        this.patientMap = new ConcurrentHashMap<>();
+        this.staffMemberMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -49,11 +60,7 @@ public class DataStorage {
      *                         milliseconds since the Unix epoch
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
-        Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
-        }
+        Patient patient = patientMap.computeIfAbsent(patientId, Patient::new);
         patient.addRecord(measurementValue, recordType, timestamp);
     }
 
@@ -169,28 +176,37 @@ public class DataStorage {
      * 
      * @param args command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         // DataReader is not defined in this scope, should be initialized appropriately.
         DataStorage storage = DataStorage.getInstance();
         DataParser parser = new JSONDataParser();
 
 
-        Map hospitalPatientMap = new HashMap<Integer, HospitalPatient>();
-        MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>(), 0);
-        IdentityManager identityManager = new IdentityManager(hospitalPatientMap,
-                storage, mismatchHandler, new PatientIdentifier(hospitalPatientMap));
+        MismatchHandler mismatchHandler = new MismatchHandler(new ArrayList<String>());
+        IdentityManager identityManager = new IdentityManager(storage, mismatchHandler);
 
         DataSourceAdapter adapter=new DataSourceAdapter(identityManager);
 
         // Use injection for interface Data parser and data source adapter, polymorphism
         // We could use any data parser, requires one small change
-        DataReader reader = new SimulationDataReader(adapter, parser);
+        URI path=new URI("ws://websocket:1");
+        AlertGenerator alertGenerator= new AlertGenerator(DataStorage.getInstance());
+        // Add the Strategies in runtime
+        alertGenerator.addAlertStrategy(new BloodPressureStrategy());
+        alertGenerator.addAlertStrategy(new OxygenSaturationStrategy());
+        alertGenerator.addAlertStrategy(new ECGPeakStrategy());
+        alertGenerator.addAlertStrategy(new HypotensiveHypoxemiaStrategy());
+        alertGenerator.addAlertStrategy(new TriggeredAlertStrategy());
+
+        DataReader reader = new WebsocketClient(parser, adapter, path, alertGenerator);
+        reader.connect();
 
         // Assuming the reader has been properly initialized and can read data into the
         // storage
-        String filePath=System.getProperty("user.dir")+"\\src";
-        System.out.println("Loading data from "+filePath);
-        reader.readData(new File(filePath+"\\SimulationOutput.txt"));
+        // String filePath=System.getProperty("user.dir")+"\\src";
+        // System.out.println("Loading data from "+filePath);
+        // reader.readData(new File(filePath+"\\SimulationOutput.txt"));
+
 
         // Example of using DataStorage to retrieve and print records for a patient
         List<PatientRecord> records = storage.getRecords(1, 0, 1800000000000L);
@@ -199,23 +215,6 @@ public class DataStorage {
                     ", Type: " + record.getRecordType() +
                     ", Data: " + record.getMeasurementValue() +
                     ", Timestamp: " + record.getTimestamp());
-        }
-
-        // Initialize the AlertGenerator with the storage
-        AlertGenerator alertGenerator = new AlertGenerator(storage);
-        // System.out.println(storage.getPatientById(2).getAllRecords().size());
-
-        // Evaluate all patients' data to check for conditions that may trigger alerts
-
-        // Add the Strategies in runtime
-        alertGenerator.addAlertStrategy(new BloodPressureStrategy());
-        alertGenerator.addAlertStrategy(new OxygenSaturationStrategy());
-        alertGenerator.addAlertStrategy(new ECGPeakStrategy());
-        alertGenerator.addAlertStrategy(new HypotensiveHypoxemiaStrategy());
-        alertGenerator.addAlertStrategy(new TriggeredAlertStrategy());
-
-        for (Patient patient : storage.getAllPatients()) {
-            alertGenerator.evaluateData(patient);
         }
     }
 }

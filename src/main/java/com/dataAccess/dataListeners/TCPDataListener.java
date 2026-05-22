@@ -1,8 +1,7 @@
-package com.dataAccess;
+package com.dataAccess.dataListeners;
 
-import com.patientIdentification.IncomingDataPoint;
-
-import java.util.List;
+import com.dataAccess.DataSourceAdapter;
+import com.dataAccess.dataParsing.JSONDataParser;
 
 /**
  * Responsible for looking for data from TCP server
@@ -28,10 +27,6 @@ public class TCPDataListener implements DataListener {
      * Stops this listener to check for updates from Tcp server.
      */
     public void stopListening() {
-
-    }
-
-    public void readFromStream () {
 
     }
 }

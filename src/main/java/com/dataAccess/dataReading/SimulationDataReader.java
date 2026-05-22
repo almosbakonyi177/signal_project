@@ -1,16 +1,18 @@
-package com.data_management;
+package com.dataAccess.dataReading;
 
-import com.dataAccess.DataParser;
 import com.dataAccess.DataSourceAdapter;
+import com.dataAccess.dataParsing.DataParser;
 import com.patientIdentification.IncomingDataPoint;
 
-import javax.swing.text.html.parser.Parser;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
-public class SimulationDataReader implements DataReader {
+/**
+ * Reads the Simulation output from a given CSV file, using ExcelDataParser.
+ */
+public class SimulationDataReader implements FileDataReader {
 
     private DataSourceAdapter adapter;
     private DataParser parser;

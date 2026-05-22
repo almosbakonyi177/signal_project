@@ -1,20 +1,27 @@
 package dataAccess;
 
+import com.alerts.AlertGenerator;
 import com.dataAccess.DataSourceAdapter;
-import com.dataAccess.ExcelDataParser;
-import com.dataAccess.JSONDataParser;
-import com.dataAccess.WebSocketDataListener;
+import com.dataAccess.dataParsing.ExcelDataParser;
+import com.dataAccess.dataParsing.JSONDataParser;
+import com.dataAccess.dataReading.DataReader;
+import com.dataAccess.dataReading.WebsocketClient;
 import com.data_management.DataStorage;
 import com.patientIdentification.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DataAccessTest {
+/**
+ * Responsible for only testing the data parsers.
+ */
+public class ParserTest {
 
     /**
      * Need to clear storage before every test, otherwise if we add patient data
@@ -28,12 +35,12 @@ public class DataAccessTest {
 
     @Test
     void excelParserTestWithHeader() {
-        String mockCSVInput="PatientId,Measurement Value,Measurement Type,Time Stamp\n" +
+        String mockCSVInput = "PatientId,Measurement Value,Measurement Type,Time Stamp\n" +
                 "1,100,Saturation,1000\n" +
                 "1,90,Saturation,1000";
 
         ExcelDataParser parser = new ExcelDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockCSVInput);
+        List<IncomingDataPoint> data = parser.parse(mockCSVInput);
 
         // Check if it read correctly and parsed the first line
         assertEquals(100, data.get(0).getMeasurementValue());
@@ -42,12 +49,12 @@ public class DataAccessTest {
 
     @Test
     void excelParserTestWithoutHeader() {
-        String mockCSVInput=
+        String mockCSVInput =
                 "1,100,Saturation,1000\n" +
-                "1,90,Saturation,1000";
+                        "1,90,Saturation,1000";
 
         ExcelDataParser parser = new ExcelDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockCSVInput);
+        List<IncomingDataPoint> data = parser.parse(mockCSVInput);
 
         // Check if it read correctly and parsed the first line
         assertEquals(100, data.get(0).getMeasurementValue());
@@ -59,12 +66,12 @@ public class DataAccessTest {
      */
     @Test
     void brokenCSVdata() {
-        String mockCSVInput=
+        String mockCSVInput =
                 "1,,Saturation,1000\n" +
                         "1,90,,1000";
 
         ExcelDataParser parser = new ExcelDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockCSVInput);
+        List<IncomingDataPoint> data = parser.parse(mockCSVInput);
 
         // Check if it read correctly and parsed the first line
         assertTrue(data.isEmpty());
@@ -77,12 +84,12 @@ public class DataAccessTest {
      */
     @Test
     void brokenandCorrectCSVdata() {
-        String mockCSVInput=
+        String mockCSVInput =
                 "1,,Saturation,1000\n" +
                         "1,90,Saturation,1000";
 
         ExcelDataParser parser = new ExcelDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockCSVInput);
+        List<IncomingDataPoint> data = parser.parse(mockCSVInput);
 
         // Check if it read correctly and parsed the first line
         assertEquals(1, data.size()); // Only can get 1 record
@@ -96,7 +103,7 @@ public class DataAccessTest {
      */
     @Test
     void JSONParserTestWithTimeStampL() {
-        String mockInput=
+        String mockInput =
                 "{\n" +
                         "\t\"patientId\":1,\n" +
                         "\t\"measurementValue\":100.0,\n" +
@@ -106,7 +113,7 @@ public class DataAccessTest {
 
         // In this test we marked the time stamp with L measurement type, in the JSON: 1000L
         JSONDataParser parser = new JSONDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockInput);
+        List<IncomingDataPoint> data = parser.parse(mockInput);
 
         // Check if it read correctly and parsed the first line
         assertEquals(1000, data.get(0).getTimestamp());
@@ -115,7 +122,7 @@ public class DataAccessTest {
 
     @Test
     void JSONParserTestWithoutTimeStampL() {
-        String mockInput=
+        String mockInput =
                 "{\n" +
                         "\t\"patientId\":1,\n" +
                         "\t\"measurementValue\":100.0,\n" +
@@ -124,7 +131,7 @@ public class DataAccessTest {
                         "}";
 
         JSONDataParser parser = new JSONDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockInput);
+        List<IncomingDataPoint> data = parser.parse(mockInput);
 
 
         // In this test I did not mark the time stamp with L measurement type, in the JSON: 1000
@@ -135,7 +142,7 @@ public class DataAccessTest {
 
     @Test
     void JSONParserTestBrokenData() {
-        String mockInput=
+        String mockInput =
                 "{\n" +
                         "\t\"patientId\":2,\n" +
                         "\t\"measurementValue\":,\n" +
@@ -143,7 +150,7 @@ public class DataAccessTest {
                         "}";
 
         JSONDataParser parser = new JSONDataParser();
-        List< IncomingDataPoint> data = parser.parse(mockInput);
+        List<IncomingDataPoint> data = parser.parse(mockInput);
 
 
         // In this test I did not mark the time stamp with L measurement type, in the JSON: 1000
@@ -151,43 +158,6 @@ public class DataAccessTest {
         assertTrue(data.isEmpty());
     }
 
-
-    @Test
-    void WebsocketDataListenerTest() {
-        JSONDataParser parser = new JSONDataParser();
-        Map<Integer, HospitalPatient> patients = new HashMap<>();
-        DataStorage dataStorage = DataStorage.getInstance();
-        PatientIdentifier identifier = new PatientIdentifier(patients);
-        IdentityManager identityManager =
-                new IdentityManager(patients, dataStorage,
-                        new MismatchHandler(null,0),identifier);
-
-
-        // Need to add at least one record, in order to have the patient in the server
-        // If the patient does not exist on server, then there will be a mismatch
-        // when we try to add the incoming data point, because there no exists a patient
-        // with the same id as the incoming data point record's id
-        // Purpose: We can only 'add' simulation data for existing patients(Who exists in hospital)
-        // This is my strategy for mismatch handling
-        // There is a test when you try to add data for non-existing patient
-        // When you try to add incoming data point(record from simulator) to a patient
-        // who does not exist=try to add an element to a null list
-        dataStorage.addPatientData(1,100,"Saturation",11000L);
-        DataSourceAdapter adapter = new DataSourceAdapter(identityManager);
-
-        WebSocketDataListener listener = new WebSocketDataListener(parser, adapter);
-        String mockInput=
-                "{\n" +
-                        "\t\"patientId\":1,\n" +
-                        "\t\"measurementValue\":100.0,\n" +
-                        "\t\"recordType\":\"ECG\",\n" +
-                        "\t\"timeStamp\":1000\n" +
-                        "}";
-
-        listener.onMessage(mockInput);
-        assertTrue(dataStorage.getPatientById(1).
-                getAllRecords().get(1).getRecordType().equals("ECG"));
-    }
 
     /**
      * Not working yet.

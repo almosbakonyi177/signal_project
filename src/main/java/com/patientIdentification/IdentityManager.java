@@ -1,7 +1,6 @@
 package com.patientIdentification;
 
 import com.data_management.DataStorage;
-import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.ArrayList;
@@ -13,19 +12,12 @@ import java.util.Map;
  * and hospital patient data. The coordinator of patient identification process.
  */
 public class IdentityManager {
-    private PatientIdentifier patientIdentifier;
-    private Map<Integer, HospitalPatient> hospitalPatientMap;
     private DataStorage dataStorage;
     private MismatchHandler mismatchHandler;
     private PatientRecordComparison comparator;
 
-    public IdentityManager(Map<Integer, HospitalPatient> hospitalPatientMap,
-                           DataStorage dataStorage,
-                           MismatchHandler mismatchHandler,
-                           PatientIdentifier identifier) {
-
-        this.hospitalPatientMap = hospitalPatientMap;
-        this.patientIdentifier = identifier;
+    public IdentityManager(DataStorage dataStorage,
+                           MismatchHandler mismatchHandler) {
 
         this.dataStorage = dataStorage;
         this.mismatchHandler = mismatchHandler;
@@ -34,16 +26,20 @@ public class IdentityManager {
 
 
     /**
-     * Makes hard copy of all the patients data to a hospital patient,
+     * Makes hard copy of the chosen hospital patient,
      * this helps to provide protection at data retrieval.
+     * @param patientId The id of hospital from who patient we want the hard copy.
      */
-    public void copyHospitalPatients() {
-        for (Patient patient : dataStorage.getAllPatients()) {
-            HospitalPatient hospitalPatient = new HospitalPatient(patient.getPatientId(),
-                    copyPatientRecords(patient.getPatientId()));
-
-            this.hospitalPatientMap.put(patient.getPatientId(), hospitalPatient);
+    public HospitalPatient getHospitalPatient(int patientId) {
+        // If the patient does not exist
+        if(!validateMatch(patientId)){
+            return null;
         }
+
+        HospitalPatient hospitalPatient = new HospitalPatient(
+                dataStorage.getPatientById(patientId).getPatientId(),
+                copyPatientRecords(dataStorage.getPatientById(patientId).getPatientId()));
+        return  hospitalPatient;
     }
 
     /**
@@ -52,6 +48,11 @@ public class IdentityManager {
      * @return A list of hard copy patient records.
      */
     public List<PatientRecord> copyPatientRecords(int patientId) {
+        // Check if the patient exists
+        if(!validateMatch(patientId)){
+            return null;
+        }
+
         List<PatientRecord> records = dataStorage.getPatientById(patientId).getAllRecords();
         List<PatientRecord> returner = new ArrayList<>();
         for (PatientRecord record : records) {
@@ -71,10 +72,8 @@ public class IdentityManager {
      * that it got from the simulation, otherwise false.
      */
     public boolean validateMatch(int simulatorPatientId) {
-        // Make sure that we updated our short term use data storage
-        copyHospitalPatients();
 
-        if (patientIdentifier.findHospitalPatient(simulatorPatientId) != null) {
+        if (dataStorage.getPatientById(simulatorPatientId) != null) {
             return true;
         }
         mismatchHandler.handleMismatch(simulatorPatientId);
@@ -85,11 +84,11 @@ public class IdentityManager {
      * Returns the hospital patient with all their data if there was a match between the
      * simulation patient id and a real hospital patient id.
      * @param simulatorPatientId
-     * @return
+     * @return A {@link HospitalPatient} object what represents a real hospital patient.
      */
     public HospitalPatient retrieveHospitalPatient(int simulatorPatientId) {
         if (validateMatch(simulatorPatientId)) {
-            return hospitalPatientMap.get(simulatorPatientId);
+            return getHospitalPatient(simulatorPatientId);
         }
         return null;
     }

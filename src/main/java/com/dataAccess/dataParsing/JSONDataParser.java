@@ -1,4 +1,4 @@
-package com.dataAccess;
+package com.dataAccess.dataParsing;
 
 import com.patientIdentification.IncomingDataPoint;
 
@@ -11,9 +11,10 @@ import java.util.List;
 public class JSONDataParser implements DataParser {
 
     /**
-     * Parses the raw text from a JSON file and turns it into an incoming data point.
+     * Parses the raw text from a JSON file and turns it into a list of
+     * standardized {@link IncomingDataPoint}.
      * @param rawData Raw text from a JSON file.
-     * @return A list of IncomingDataPoint objects, in which the
+     * @return A list of {@link IncomingDataPoint} objects, in which the
      * data are standardized.
      */
     @Override

@@ -8,11 +8,10 @@ import java.util.List;
  */
 public class MismatchHandler {
     private List<String> mismatchLog;
-    private long timeStamp;
+    long timeStamp = 0;
 
-    public MismatchHandler(List<String> mismatchLog, long timeStamp) {
+    public MismatchHandler(List<String> mismatchLog) {
         this.mismatchLog = mismatchLog;
-        this.timeStamp = timeStamp;
     }
 
     /**
@@ -20,18 +19,19 @@ public class MismatchHandler {
      * @param simulatorPatientId Integer of patient Id that came from the simulation.
      */
     public void handleMismatch(int simulatorPatientId) {
+        timeStamp = System.currentTimeMillis();
         if (mismatchLog != null) {
             mismatchLog.add(Integer.toString(simulatorPatientId) +
                     "," + Long.toString(timeStamp));
         }
     }
 
+    /**
+     * Retrieves the mismatch log of this MismatchHandler.
+     * @return The mismatch log of this MismatchHandler.
+     */
     public List<String> getMismatchLog() {
         return this.mismatchLog;
-    }
-
-    public void setTime(long time) {
-        this.timeStamp=time;
     }
 
 }
