@@ -66,3 +66,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Project Members
 - Student ID:6424784
+
+## What did I add in Project Part 2
+I added/extended the following modules:
+-Alert generator
+-Data management
+-Data access
+-Patient identification
+I created concise descriptions and uml charts, which are placed in the uml_models folder.
+I used concise and clear comments in the code throughout the process.
