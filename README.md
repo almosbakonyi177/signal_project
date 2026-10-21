@@ -73,7 +73,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 | Module | Responsibility |
 |---|---|
 | `cardio_generator` | Generates simulated patient data and streams it (console, file, TCP, WebSocket) |
-| `dataAccess` | Receives incoming data from files, TCP or WebSocket and parses it |
+| `dataAccess` | Receives incoming data from files or WebSocket and parses it |
 | `data_management` | Stores patient records, controls staff access and logs data requests |
 | `patientIdentification` | Matches incoming data points to hospital patients and handles mismatches |
 | `alerts` | Evaluates patient records and generates alerts |
@@ -89,15 +89,15 @@ This repository was developed in five phases as part of the Software Engineering
 
 ### Part 2 – System design
 - Designed four subsystems: Alert Generation, Data Storage, Patient Identification and Data Access Layer
-- Created UML class diagrams and written descriptions for each (see `uml_models/`)
+- Created UML class diagrams and wrote descriptions for each (see `uml_models/`)
 
 ### Part 3 – Implementation and testing
-- Implemented data reading from the simulator's output files into `DataStorage`
+- Implemented reading patient data from files (JSON-style and CSV formats) into `DataStorage`
 - Implemented the alert logic in `AlertGenerator`:
-  - **Blood pressure:** critical thresholds (systolic above 180 or below 90 mmHg, diastolic above 120 or below 60 mmHg) and trends of three consecutive readings changing by more than 10 mmHg each
-  - **Blood oxygen saturation:** below 92%, or a drop of more than 5% within 10 minutes
-  - **Hypotensive hypoxemia:** systolic pressure below 90 mmHg combined with saturation below 92%
-  - **ECG:** peaks far above the moving average, using a one-hour sliding window
+  - **Blood pressure:** critical thresholds (systolic above 180 or below 90 mmHg, diastolic above 120 or below 60 mmHg) and trends of three changes of more than 10 mmHg in the same direction (a change of 10 mmHg or less resets the trend)
+  - **Blood oxygen saturation:** below 92%, or a drop of more than 5 percentage points between consecutive readings less than 10 minutes apart
+  - **Hypotensive hypoxemia:** systolic pressure below 90 mmHg and saturation below 92% within 5 minutes
+  - **ECG:** readings more than 1.5 times the moving average of recent ECG values; the window restarts after a gap of over one hour and values older than 6 hours are discarded
   - **Triggered alerts:** emitted when a nurse or patient presses the alert button
 - Refactored all modules following the SOLID principles
 - Wrote unit tests for every module, covering normal and edge cases (JaCoCo coverage report in `TestCoverageReport.pdf`)
@@ -110,11 +110,14 @@ This repository was developed in five phases as part of the Software Engineering
 - Added unit, module and integration tests
 
 ### Part 5 – Real-time data
-- Adapted the `DataReader` interface for a continuous data stream and implemented a `WebsocketClient` that connects to the simulator
-- Incoming messages are parsed, matched to patients and stored in `DataStorage`, then evaluated for alerts immediately
-- Corrupted messages and connection errors or interruptions are caught and logged without stopping the client
-- `DataStorage` uses concurrent maps, so simultaneous updates are handled safely
-- Refactored the Patient Identification module and added tests for the WebSocket client and data parsing
+- Adapted the `DataReader` interface for streamed data and implemented a `WebsocketClient` that receives JSON messages
+- Each incoming message is parsed, matched to a patient and stored in `DataStorage`, then evaluated for alerts immediately
+- Corrupted messages are caught and logged without stopping the client; connection errors and disconnects are logged
+- `DataStorage` keeps patients and staff in concurrent maps (`ConcurrentHashMap`)
+- Refactored the Patient Identification module and added tests for message handling, including corrupted messages
+- Duplicate records are detected and skipped, so repeated messages do not create duplicate data
+
+
 ## Testing
 
 Run all tests with:
